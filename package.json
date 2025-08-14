@@ -1,0 +1,61 @@
+{
+	"name": "playwright-io",
+	"version": "1.0.0",
+	"description": "Mobile automation test using playwright",
+	"license": "MIT",
+	"author": "Flavio Romero",
+	"engines": {
+		"node": ">=18.20.0"
+	},
+	"tags": [
+		"playwright",
+		"webdriverio",
+		"mobile",
+		"automation",
+		"test",
+		"appium",
+		"webdriver",
+		"playwrightio",
+		"playwright-io",
+		"playwright-webdriverio"
+	],
+	"keywords": [
+		"playwright",
+		"webdriverio",
+		"mobile",
+		"automation",
+		"test",
+		"appium",
+		"webdriver",
+		"playwrightio",
+		"playwright-io",
+		"playwright-webdriverio"
+	],
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/flavio-arc9/playwright-io.git"
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "npm run clean && tsc",
+		"clean": "rm -rf dist",
+		"test": "playwright test",
+		"prepublishOnly": "npm run build"
+	},
+	"devDependencies": {
+		"@types/node": "^22.10.7",
+		"typescript": "~5.8.2"
+	},
+	"peerDependencies": {
+		"@playwright/test": "latest"
+	},
+	"dependencies": {
+		"@ffmpeg-installer/ffmpeg": "^1.1.0",
+		"glob": "^11.0.3",
+		"webdriverio": "latest"
+	}
+}

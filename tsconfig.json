@@ -1,0 +1,34 @@
+{
+	"compilerOptions": {
+		"outDir": "dist", 			// Carpeta donde se generarán los archivos compilados
+		"target": "ES2022", 		// Define el nivel de ECMAScript que deseas usar
+		"module": "CommonJS", 		// Usa CommonJS para compatibilidad con Node.js
+		"moduleResolution": "Node", // Resolución de módulos compatible con Node.js
+		"strict": true, 			// Activa comprobaciones estrictas de TypeScript
+		"esModuleInterop": true, 	// Facilita la interoperabilidad entre módulos CommonJS y ES
+		"skipLibCheck": true, 		// Omite la comprobación de tipos de las dependencias
+		"declaration": true, 		// Genera archivos de declaración (.d.ts)
+		"sourceMap": true, 			// Genera archivos de mapa de fuente para depuración
+		"resolveJsonModule": true, 	// Permite la importación de módulos JSON
+		"lib": [
+			"ES2022",
+			"DOM"
+		], 							// Especifica las bibliotecas estándar de TypeScript
+		"experimentalDecorators": true, // Habilita el uso de decoradores experimentales
+		"emitDecoratorMetadata": true,  // Habilita la emisión de metadatos de decoradores
+		"types": [
+			"webdriverio",
+			"@wdio/types",
+			"playwright",
+		]
+	},
+	"include": [
+		"src/**/*"
+	], 								// Incluye todos los archivos en la carpeta src
+	"exclude": [
+		"node_modules",
+		"**/node_modules/*",
+		"dist",
+		"/*.js"
+	]
+}
