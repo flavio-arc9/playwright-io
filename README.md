@@ -2,24 +2,12 @@
 *Playwright Library for Native Mobile Testing*
 
 [![npm version](https://badge.fury.io/js/playwright-io.svg)](https://www.npmjs.com/package/playwright-io)
-[![Node.js CI](https://github.com/fromeroc9/playwright-io/workflows/Node.js%20CI/badge.svg)](https://github.com/fromeroc9/playwright-io/actions)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-blue.sv### 🏗️ **SelectorStrategy Interface**
-```typescript
-interface SelectorStrategy {
-  android?: string;  // Android-specific selector (UiAutomator2)
-  ios?: string;      // iOS-specific selector (XCUITest)  
-  web?: string;      // Web/WebView selector (CSS/XPath)
-}
-```
-
-## 🔧 Advanced Features
-
-### 📱 **Context Management**ww.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 🏗️ Technical Overview
 
-**playwright-io** is a TypeScript library that extends Playwright's testing capabilities with native mobile automation support. Built on top of WebDriverIO and the Appium ecosystem, this library provides seamless integration between Playwright's modern testing API and mobile device automation, allowing developers to write cross-platform tests using familiar Playwright syntax while leveraging mature mobile automation infrastructure.
+**Playwright-IO** is a TypeScript library that extends Playwright's testing capabilities with native mobile automation support. Built on top of WebDriverIO and the Appium ecosystem, this library provides seamless integration between Playwright's modern testing API and mobile device automation, allowing developers to write cross-platform tests using familiar Playwright syntax while leveraging mature mobile automation infrastructure.
 
 ### 🎯 Core Architecture
 
