@@ -1,3 +1,4 @@
+import { helpers } from "./helpers";
 import { NetworkInterceptor } from "./network";
 import { getSelector } from "./selector";
 import { Context, Page, Selector, WaitForElementOptions } from "./types";
@@ -21,8 +22,10 @@ export class Pages {
      */
     async resolve() {
         this.networkInterceptor.startCapturing();
-        await this.configViewport();
-        await this.setupPageContent();
+
+        if (helpers.isTraceEnabled()) {
+            await this.setupPageContent();
+        }
     }
     
     /**
@@ -33,22 +36,6 @@ export class Pages {
     }
 
     /**
-     * Configures the page viewport based on driver capabilities.
-     */
-    private async configViewport() {
-        const capabilities = this.driver.capabilities as any;
-        const viewport = capabilities.viewportRect;
-
-        if (!viewport) return;
-
-        const pixelRatio = Math.round(capabilities.pixelRatio) + 1;
-        const width = Math.round(viewport.width / pixelRatio);
-        const height = Math.round(viewport.height / pixelRatio);
-
-        await this.page.setViewportSize({ width, height });
-    }
-
-    /**
      * Sets up the page content with mobile device viewer.
      */
     private async setupPageContent() {
@@ -56,10 +43,12 @@ export class Pages {
         await this.page.setContent(deviceViewer);
     }
 
-        /**
+    /**
      * Creates HTML content for mobile device viewer.
      */
     private devicesViewer(): string {
+        const mjpegServerPort = (this.driver.capabilities as any)?.mjpegServerPort;
+
         return `
             <html style="height: 100%;">
                 <head>
@@ -67,7 +56,7 @@ export class Pages {
                 </head>
                 <body style="margin: 0px; height: 100%; background-color: rgb(14, 14, 14);">
                     <img style="display: block; -webkit-user-select: none; margin: auto; background-color: hsl(0, 0%, 25%); height: 100%;" 
-                         src="http://localhost:9000/">
+                         src="http://localhost:${mjpegServerPort}/">
                 </body>
             </html>
         `;
@@ -86,6 +75,12 @@ export class Pages {
      * @returns Object containing extended page methods
      */
     private extensions = () => ({
+        /**
+         * The `io` property provides access to the WebDriverIO context within the Playwright page.
+         * This is a reference to the playwright-io project integration.
+         * @returns Context - The WebDriverIO context for the page
+         */
+        io: this.driver,
         /**
          * Finds a single element using WebDriverIO locator syntax.
          * @param locator - CSS selector, XPath, or WebDriverIO selector string

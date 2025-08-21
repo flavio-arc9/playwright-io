@@ -15,6 +15,8 @@ export class Command {
 
     /**
      * Serializes method arguments into a readable string format for logging.
+     * @param args The method arguments to serialize.
+     * @returns A string representation of the serialized arguments.
      */
     private serializeMethodArguments(args: unknown[]) {
         if (args.length === 0) {
@@ -28,6 +30,8 @@ export class Command {
 
     /**
      * Formats a single argument for display in logs.
+     * @param arg The argument to format.
+     * @returns A string representation of the argument.
      */
     private formatArgument(arg: unknown) {
         if (typeof arg === 'function') {
@@ -43,6 +47,8 @@ export class Command {
 
     /**
      * Wraps a WebDriverIO instance to provide step logging and method tracking.
+     * @param instance The WebDriverIO instance to wrap.   
+     * @returns A Proxy object that intercepts method calls for logging.
      */
     public wrapInstance<T extends object>(instance: T): T {
         this.validateInstance(instance);
@@ -75,6 +81,7 @@ export class Command {
 
     /**
      * Validates that the instance is a valid object for wrapping.
+     * @param instance The instance to validate.
      */
     private validateInstance(instance: unknown) {
         if (typeof instance !== 'object' || instance === null) {
@@ -84,6 +91,9 @@ export class Command {
 
     /**
      * Creates a descriptive title for the test step.
+     * @param methodName The name of the method being called.
+     * @param formattedArgs The formatted arguments for the method call.
+     * @returns A string representation of the step title.
      */
     private createStepTitle(methodName: string, formattedArgs: string) {
         return formattedArgs
@@ -93,6 +103,8 @@ export class Command {
 
     /**
      * Checks if the method is an element-related method.
+     * @param methodName The name of the method to check.
+     * @returns True if the method is an element-related method, false otherwise.
      */
     private isElementMethod(methodName: string) {
         return Command.ELEMENT_METHODS.some(method =>
@@ -102,6 +114,8 @@ export class Command {
 
     /**
      * Finds the element method configuration by method name.
+     * @param methodName The name of the method to find.
+     * @returns The element method configuration or undefined if not found.
      */
     private findElementMethod(methodName: string) {
         return Command.ELEMENT_METHODS.find(method =>
@@ -111,6 +125,9 @@ export class Command {
 
     /**
      * Wraps element results to provide step logging for element interactions.
+     * @param object The object to wrap (element or elements).
+     * @param elementMethod The name of the element method being called.
+     * @returns A Proxy object that intercepts method calls for logging.
      */
     private wrapElement<T extends object>(object: T, elementMethod: string) {
         if (typeof object !== 'object' || object === null) return object;
@@ -138,6 +155,8 @@ export class Command {
 
     /**
      * Determines if logging should be skipped for certain methods (like promise methods).
+     * @param propertyName The name of the property to check.
+     * @returns True if logging should be skipped, false otherwise.
      */
     private shouldSkipLogging(propertyName: string) {
         return Command.EXCLUDED_PROMISE_METHODS.includes(propertyName as any);
@@ -145,6 +164,10 @@ export class Command {
 
     /**
      * Creates a descriptive title for element interaction steps.
+     * @param elementTypeName The type of element (e.g., 'Element', 'Elements').
+     * @param propertyName The name of the property being accessed.
+     * @param formattedArgs The formatted arguments for the method call.
+     * @returns A string representation of the element interaction step title.
      */
     private createElementStepTitle(elementTypeName: string, propertyName: string, formattedArgs: string) {
         return formattedArgs

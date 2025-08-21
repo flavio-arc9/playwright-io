@@ -1,24 +1,12 @@
 {
 	"name": "playwright-io",
-	"version": "1.0.0",
-	"description": "Mobile automation test using playwright",
+	"version": "1.0.1",
+	"description": "Mobile Testing with Playwright runner",
 	"license": "MIT",
 	"author": "Flavio Romero",
 	"engines": {
 		"node": ">=18.20.0"
 	},
-	"tags": [
-		"playwright",
-		"webdriverio",
-		"mobile",
-		"automation",
-		"test",
-		"appium",
-		"webdriver",
-		"playwrightio",
-		"playwright-io",
-		"playwright-webdriverio"
-	],
 	"keywords": [
 		"playwright",
 		"webdriverio",

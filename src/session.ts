@@ -1,8 +1,8 @@
 import { remote } from "webdriverio";
 import { Context, IORemote, TestOptions } from "./types";
 import { test } from './fixture';
-import { Recorder } from "./records";
-import { annotation } from "./helpers";
+import { Recorder } from "./record";
+import { helpers } from "./helpers";
 import { command } from "./command";
 
 /**
@@ -12,8 +12,9 @@ import { command } from "./command";
 export class Session {
 
     private static readonly DEFAULT_APPIUM_HOST = 'http://127.0.0.1:4723';
-    private static readonly DEFAULT_MJPEG_PORT = 9000;
-    private static readonly DEFAULT_LOG_LEVEL = 'error';
+    private static readonly DEFAULT_MJPEG_PORT = 9110;
+    private static readonly DEFAULT_SYS_PORT = 8210;
+    private static readonly DEFAULT_LOG_LEVEL = 'silent';
 
     private driver: Context | undefined;
     private record: Recorder | undefined;
@@ -28,6 +29,9 @@ export class Session {
 
     /**
      * Validates configuration and creates a session instance if valid.
+     * @param config  The WebDriverIO remote configuration with capabilities
+     * @param testInfo The test information object
+     * @returns A new Session instance or undefined if configuration is invalid
      */
     static isValid(config: IORemote, testInfo: TestOptions): Session | undefined {
         if (!(config.capabilities && Object.keys(config.capabilities).length > 0)) {
@@ -39,6 +43,7 @@ export class Session {
 
     /**
      * Determines if this is a browser session (not mobile).
+     * @returns True if the session is a browser, false otherwise.
      */
     private isBrowser() {
         const capabilities = this.config.capabilities;
@@ -51,10 +56,37 @@ export class Session {
     }
 
     /**
+     * Determines if this is an Android session.
+     * @returns True if the session is Android, false otherwise.
+     */
+    private isAndroid() {
+        const capabilities = this.config.capabilities;
+        return !!(capabilities &&
+            typeof capabilities === 'object' &&
+            'platformName' in capabilities &&
+            capabilities.platformName?.toUpperCase() === 'ANDROID');
+    }
+
+    /**
+     * Determines if this is an iOS session.
+     * @returns True if the session is iOS, false otherwise.
+     */
+    private isIOS(): boolean {
+        const capabilities = this.config.capabilities;
+        return !!(capabilities &&
+            typeof capabilities === 'object' &&
+            'platformName' in capabilities &&
+            capabilities.platformName?.toUpperCase() === 'IOS');
+    }
+
+    /**
      * Configures session for mobile/Appium usage.
      */
     private configMobile() {
         const defaultUrl = new URL(Session.DEFAULT_APPIUM_HOST);
+        const workerId = test.info().workerIndex;
+        const systemPort = Session.DEFAULT_SYS_PORT + workerId;
+        const mjpegPort = Session.DEFAULT_MJPEG_PORT + workerId;
 
         this.config = {
             ...this.config,
@@ -63,10 +95,27 @@ export class Session {
             port: this.config.port || parseInt(defaultUrl.port, 10)
         };
 
-        this.config.capabilities = {
-            ...this.config.capabilities,
-            'appium:mjpegServerPort': Session.DEFAULT_MJPEG_PORT
-        };
+        if (this.isAndroid()) {
+            this.config.capabilities = {
+                ...this.config.capabilities,
+                'appium:systemPort': systemPort
+            };
+        }
+
+        if (this.isIOS()) {
+            this.config.capabilities = {
+                ...this.config.capabilities,
+                'appium:wdaLocalPort': systemPort
+            };
+        }
+
+        if (helpers.isTraceEnabled()) {
+            this.config.capabilities = {
+                ...this.config.capabilities,
+                'appium:mjpegServerPort': mjpegPort
+            };
+        }
+
     }
 
     /**
@@ -81,9 +130,12 @@ export class Session {
 
     /**
      * Creates and initializes a WebDriverIO session with recording capabilities.
+     * @returns A promise that resolves to the WebDriverIO driver instance.
      */
     async createSession() {
         return await test.step("Start PlaywrightIO", async () => {
+            helpers.setCapability(this.config.capabilities);
+
             this.driver = await remote(this.config);
 
             const recordingConfig = this.testInfo.recordingScreen;
@@ -92,10 +144,10 @@ export class Session {
             if (isRecordingEnabled) {
                 const recordingOptions = typeof recordingConfig === 'object' ? recordingConfig : {};
                 this.record = new Recorder(this.driver, test.info(), recordingOptions);
-                await this.record.start(this.isBrowser());
+                await this.record.start();
             }
 
-            annotation.add(this.driver, this.config.capabilities);
+            helpers.setSession(this.driver.sessionId);
             return command.wrapInstance(this.driver);
         }, { box: true });
     }
@@ -116,7 +168,7 @@ export class Session {
             }
 
             if (isRecordingEnabled && this.record) {
-                await this.record.stop(this.isBrowser());
+                await this.record.stop();
             }
 
             await this.driver.deleteSession();

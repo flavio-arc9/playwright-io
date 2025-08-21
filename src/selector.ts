@@ -7,6 +7,8 @@ import { Selector } from "./types";
 class PlatformDetector {
     /**
      * Determines if the driver is running on Android platform.
+     * @param driver - WebDriverIO browser instance
+     * @returns True if the driver is running on Android, false otherwise
      */
     static isAndroid(driver: Browser): boolean {
         return driver.isAndroid;
@@ -14,6 +16,8 @@ class PlatformDetector {
 
     /**
      * Determines if the driver is running on iOS platform.
+     * @param driver - WebDriverIO browser instance
+     * @returns True if the driver is running on iOS, false otherwise
      */
     static isIOS(driver: Browser): boolean {
         return driver.isIOS;
@@ -21,6 +25,8 @@ class PlatformDetector {
 
     /**
      * Determines if the driver is running on a mobile platform.
+     * @param driver - WebDriverIO browser instance
+     * @returns True if the driver is running on a mobile platform, false otherwise
      */
     static isMobile(driver: Browser): boolean {
         return driver.isMobile;
@@ -28,6 +34,8 @@ class PlatformDetector {
 
     /**
      * Determines if the driver is running in a web browser context.
+     * @param driver - WebDriverIO browser instance
+     * @returns True if the driver is running in a web browser context, false otherwise
      */
     static isWebBrowser(driver: Browser): boolean {
         return (
@@ -66,6 +74,9 @@ export function getSelector(driver: Browser, locator: Selector | string): string
 
 /**
  * Resolves the appropriate selector based on platform detection.
+ * @param driver - WebDriverIO browser instance
+ * @param selector - Selector object containing platform-specific selectors
+ * @returns The resolved selector string or undefined if not found
  */
 function resolvePlatformSelector(driver: Browser, selector: Selector): string | undefined {
     if (PlatformDetector.isAndroid(driver) && selector.android) {

@@ -1,4 +1,5 @@
 import type { Capabilities } from "@wdio/types";
+import { ChainablePromiseArray, ChainablePromiseElement } from "webdriverio";
 
 /**
  * Test runner hook names supported by WebDriverIO.
@@ -54,9 +55,20 @@ type TestRunnerOptions =
     | 'watch'
     | 'shard';
 
+
 export { TestOptions } from './TestOptions';
-export { Context, TestArgs } from './TestArgs';
+export { Context, TestArgs, HiddenTestArgs, WorkerArgs } from './TestArgs';
 export { Page } from './Page';
+
+/** 
+ * Represents ChainablePromiseElement 
+ */
+export type Element = ChainablePromiseElement;
+
+/** 
+ * Represents ChainablePromiseArray 
+ */
+export type Elements = ChainablePromiseArray;
 
 /**
  * WebDriverIO configuration type without test runner specific options.

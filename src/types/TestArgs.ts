@@ -1,5 +1,8 @@
-import { Page, TestOptions } from "."
+import { IOCapabilities, IOConfig, Page, RecorderOptions, TestOptions } from "."
 import { Browser as ExtendBrowser } from "webdriverio";
+import { PlaywrightTestArgs, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from "@playwright/test";
+import { Session } from "../session";
+
 
 /**
  * Context represents WebDriverIO's Browser instance, 
@@ -8,7 +11,10 @@ import { Browser as ExtendBrowser } from "webdriverio";
  */
 export type Context = ExtendBrowser 
 
-export interface TestArgs extends TestOptions {
+/**
+ * Test arguments for a single test case.
+ */
+export interface TestArgs extends TestOptions, PlaywrightTestArgs {
     /**
      * The WebDriverIO browser instance that gives access to WebDriverIO's browser API commands.
      * This represents the main browser context for WebDriverIO interaction.
@@ -26,3 +32,20 @@ export interface TestArgs extends TestOptions {
      */
     page: Page
 }
+
+/**
+ * Hidden test arguments used internally by the fixture system.
+ * These are not exposed in the public API but are used for configuration merging.
+ */
+export interface HiddenTestArgs {
+    _useCapabilities: IOCapabilities;
+    _useConfig: IOConfig;
+    _useSession?: Session;
+    _useRecordingScreen: RecorderOptions | boolean;
+    _useTakeScreenshot: boolean;
+}
+
+/**
+ * Worker arguments
+ */
+export type WorkerArgs = PlaywrightWorkerArgs & PlaywrightWorkerOptions;

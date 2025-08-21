@@ -7,25 +7,12 @@ import { Context, IOCapabilities } from "./types";
  * Provides helper methods for enriching test information with WebDriverIO session details.
  */
 class Helper {
-    
-    /**
-     * Adds WebDriverIO session and capability annotations to the current test.
-     * This enhances test reporting with relevant session metadata.
-     * 
-     * @param driver - The WebDriverIO context/driver instance
-     * @param capabilities - The capabilities object used for the session
-     */
-    public add(driver: Context, capabilities: IOCapabilities): void {
-        this.setSession(driver);
-        this.setCapability(capabilities);
-    }
 
     /**
      * Adds the session ID as a test annotation.
+     * @param driver - The WebDriverIO context/driver instance
      */
-    private setSession(driver: Context): void {
-        const sessionId = driver.sessionId || 'unknown';
-        
+    public setSession(sessionId: string): void {
         test.info().annotations.push({
             type: 'Session ID',
             description: this.formatValue(sessionId),
@@ -34,8 +21,9 @@ class Helper {
 
     /**
      * Adds each capability as a separate test annotation.
+     * @param capabilities - The capabilities object used for the session
      */
-    private setCapability(capabilities: IOCapabilities): void {
+    public setCapability(capabilities: IOCapabilities): void {
         for (const [key, value] of Object.entries(capabilities)) {
             test.info().annotations.push({
                 type: key,
@@ -46,6 +34,7 @@ class Helper {
 
     /**
      * Formats capability values for display in annotations.
+     * @param value - The capability value to format
      */
     private formatValue(value: unknown): string {
         if (typeof value === 'object' && value !== null) {
@@ -58,6 +47,27 @@ class Helper {
         
         return String(value);
     }
+
+    /**
+     * Checks if tracing is enabled based on the test configuration.
+     * @returns True if tracing is enabled, false otherwise.
+     */
+    public isTraceEnabled() {
+        const useTrace = test.info().project.use.trace || 'off';
+
+        if (typeof useTrace === 'string') {
+            return useTrace !== 'off';
+        }
+
+        if (typeof useTrace === 'object' && useTrace !== null) {
+            return useTrace.mode !== 'off';
+        }
+
+        return false;
+    }
 }
 
-export const annotation = new Helper();
+/**
+ * Global instance of the Helper class for test annotations.
+ */
+export const helpers = new Helper();

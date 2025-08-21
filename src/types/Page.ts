@@ -1,9 +1,17 @@
 
 import { Page as OriginPage } from '@playwright/test';
-import { ChainablePromiseArray, ChainablePromiseElement } from "webdriverio";
-import { Selector } from '.';
+import { Context, Element, Elements, Selector } from '.';
 
+/**
+ * Extended Playwright Page interface that adds limited WebDriverIO element selection capabilities.
+ */
 export interface Page extends OriginPage {
+    /**
+     * The `io` property provides access to the WebDriverIO context within the Playwright page.
+     * This is a reference to the playwright-io project integration.
+     * @returns Context - The WebDriverIO context for the page
+     */
+    io: Context;
     /**
      * The `locator$` command is a WebDriverIO method that finds an element in the page using 
      * CSS or XPath selectors.
@@ -11,7 +19,7 @@ export interface Page extends OriginPage {
      * It returns a WebDriverIO element that can be used to perform actions like click, setText, etc.
      * 
      * @param selector  A CSS or XPath selector to query the element
-     * @return ChainablePromiseElement  WebDriverIO element object for the found element
+     * @return Element == ChainablePromiseElement  WebDriverIO element object for the found element
      * 
      * @example
      * ```ts
@@ -24,7 +32,7 @@ export interface Page extends OriginPage {
      * console.log(await header.getText());
      * ```
      */
-    locator$: (selector: string) => ChainablePromiseElement;
+    locator$: (selector: string) => Element;
     /**
      * The `locator$$` command is a WebDriverIO method that finds multiple elements in the page using 
      * CSS or XPath selectors.
@@ -32,7 +40,7 @@ export interface Page extends OriginPage {
      * It returns an array of WebDriverIO elements that can be used to perform actions on each element.
      * 
      * @param selector  A CSS or XPath selector to query the elements
-     * @return ChainablePromiseArray  Array of WebDriverIO element objects for the found elements
+     * @return Elements == ChainablePromiseArray  Array of WebDriverIO element objects for the found elements
      * 
      * @example
      * ```ts
@@ -51,7 +59,7 @@ export interface Page extends OriginPage {
      * console.log(headerTexts);
      * ```
      */
-    locator$$: (selector: string) => ChainablePromiseArray;
+    locator$$: (selector: string) => Elements;
     /**
      * The `selector` method finds an element using platform-specific selectors.
      * 
@@ -60,7 +68,7 @@ export interface Page extends OriginPage {
      * The appropriate selector is chosen based on the current platform.
      * 
      * @param selector  A string selector or `Selector` object with platform-specific selectors
-     * @return ChainablePromiseElement  WebDriverIO element object for the found element
+     * @return Element == ChainablePromiseElement  WebDriverIO element object for the found element
      * 
      * @example
      * ```ts
@@ -77,7 +85,7 @@ export interface Page extends OriginPage {
      * await menuButton.click();
      * ```
      */
-    selector: (selector: Selector | string) => ChainablePromiseElement;
+    selector: (selector: Selector | string) => Element;
     /**
      * The `selectors` method finds multiple elements using platform-specific selectors.
      * 
@@ -86,7 +94,7 @@ export interface Page extends OriginPage {
      * The appropriate selector is chosen based on the current platform.
      * 
      * @param selector  A string selector or `Selector` object with platform-specific selectors
-     * @return ChainablePromiseArray  Array of WebDriverIO element objects for the found elements
+     * @return Element == ChainablePromiseArray  Array of WebDriverIO element objects for the found elements
      * 
      * @example
      * ```ts
@@ -105,7 +113,61 @@ export interface Page extends OriginPage {
      * console.log(itemTexts);
      * ```
      */
-    selectors: (selector: Selector | string) => ChainablePromiseArray;
+    selectors: (selector: Selector | string) => Elements;
+    /**
+     * The `element` method finds an element using platform-specific selectors.
+     * 
+     * This method enhances `locator$` by accepting either a string selector or a `Selector` 
+     * object that can contain different selectors for various platforms (android, ios, web, mobile).
+     * The appropriate selector is chosen based on the current platform.
+     * 
+     * @param selector  A string selector or `Selector` object with platform-specific selectors
+     * @return Element  WebDriverIO element object for the found element
+     * 
+     * @example
+     * ```ts
+     * // using string selector
+     * const button = page.element('.submit-button');
+     * await button.click();
+     * 
+     * // using platform-specific Selector object
+     * const menuButton = page.element({
+     *   android: '-android=resourceId("com.example.app:id/menu_button")',
+     *   ios: '~Menu',
+     *   web: '#menuBtn'
+     * });
+     * await menuButton.click();
+     * ```
+     */
+    element: (selector: Selector | string) => Element;
+    /**
+     * The `elements` method finds multiple elements using platform-specific selectors.
+     * 
+     * This method enhances `locator$$` by accepting either a string selector or a `Selector` 
+     * object that can contain different selectors for various platforms (android, ios, web, mobile).
+     * The appropriate selector is chosen based on the current platform.
+     * 
+     * @param selector  A string selector or `Selector` object with platform-specific selectors
+     * @return Elements  Array of WebDriverIO element objects for the found elements
+     * 
+     * @example
+     * ```ts
+     * // using string selector
+     * const buttons = page.elements('.btn');
+     * console.log('Number of buttons found:', buttons.length);
+     * 
+     * // using platform-specific Selector object
+     * const listItems = page.elements({
+     *   android: '-android=className("android.widget.ListView").childSelector(className("android.widget.ListItem"))',
+     *   ios: '//XCUIElementTypeTable//XCUIElementTypeCell',
+     *   web: '.list-item'
+     * });
+     * 
+     * const itemTexts = await Promise.all(listItems.map(item => item.getText()));
+     * console.log(itemTexts);
+     * ```
+     */
+    elements: (selector: Selector | string) => Elements;
     /**
      * The `waitForElement` method waits for an element to appear in the DOM using platform-specific selectors.
      * 
@@ -115,11 +177,11 @@ export interface Page extends OriginPage {
      * 
      * @param locator  A string selector or `Selector` object with platform-specific selectors
      * @param options  Optional parameters to control the wait behavior
-     * @return ChainablePromiseArray  Array of WebDriverIO element objects for the found elements
+     * @return ChainablePromiseArray/Element  Array of WebDriverIO element objects for the found elements
      */
     waitForElement: (locator: string | Selector, options?: {
         timeout?: number;
         visible?: boolean;
         enabled?: boolean;
-    }) => ChainablePromiseArray;
+    }) => Elements;
 }
