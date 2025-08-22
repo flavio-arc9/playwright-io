@@ -3,30 +3,79 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>Document</title>
+	<title>Playwright IO Docs</title>
+	<link rel="icon" type="image/svg+xml" href="./logo.svg" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<meta name="description" content="Description">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+	<style>
+		.docsify-pagination-container{
+			margin: 0em 0 1em !important;
+		}
+		.pagination-item-title {
+			font-size: 1.2em !important;
+		}
+	</style>
 </head>
 
 <body>
+<nav class="app-nav badge">
+	<ul>
+		<li>Translations
+			<ul>
+				<li><a href="#/en/index" title=" English"><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f1ec-1f1e7.png?v8.png" alt="uk" class="emoji" loading="lazy"> English</a></li>
+				<li><a href="#/es/index" title=" Español" class="active"><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f1ea-1f1f8.png?v8.png" alt="es" class="emoji" loading="lazy"> Español</a></li>
+			</ul>
+		</li>
+	</ul>
+</nav>
 	<div id="app"></div>
 	<script>
 		window.$docsify = {
 			name: '<img src="logo.svg" width="32" height="32" style="vertical-align: bottom; margin-right: 4px"/>PlaywrightIO',
 			repo: 'flavio-arc9/playwright-io',
-			homepage: 'index.md',
+			homepage: 'es/index.md',
 			loadSidebar: true,
 			auto2top: true,
 			subMaxLevel: 3,
 			alias: {
 				'.*?/changelog': 'https://raw.githubusercontent.com/flavio-arc9/playwright-io/master/CHANGELOG.md',
-				'/.*/_sidebar.md': '/_sidebar.md',
+				'/es/_sidebar.md': '/es/_sidebar.md',
+				'/en/_sidebar.md': '/en/_sidebar.md',
+				'/_sidebar.md': '/es/_sidebar.md'
+			},
+			fallbackLanguages: ['es', 'en'],
+			search: {
+				maxAge: 86400000, // Expiration time, the default one day
+				paths: 'auto',
+				placeholder: {
+					'/': '🔍 Buscar...',
+					'/es/': '🔍 Buscar...',
+					'/en/': '🔍 Search...'
+				},
+				noData: {
+					'/': '😞 ¡No hay resultados!',
+					'/es/': '😞 ¡No hay resultados!',
+					'/en/': '😞 No Results!'
+				},
+				depth: 6,
+				hideOtherSidebarContent: false
 			},
 			pagination: {
-          		crossChapter: true,
-        	},	
+				previousText: {
+					'/': 'Anterior',
+					'/es/': 'Anterior',
+					'/en/': 'Previous'
+				},
+				nextText: {
+					'/': 'Siguiente',
+					'/es/': 'Siguiente', 
+					'/en/': 'Next'
+				},
+				crossChapter: true,
+				crossChapterText: true
+			},
 		}
 	</script>
 	<!-- Docsify v4 -->
@@ -36,6 +85,63 @@
     <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
 	<script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+	<script src="//unpkg.com/docsify-pagination/dist/docsify-pagination.min.js"></script>
+	<script src="//unpkg.com/docsify-copy-code@2"></script>
+	<!-- Plugin para tabs (útil para selector de idioma) -->
+	<script src="//cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+	<!-- Script para manejar idioma por defecto -->
+	<script>
+		// Plugin mejorado para manejar navegación de idiomas
+		window.$docsify.plugins = [].concat(function(hook, vm) {
+			function updateActiveNav() {
+				var currentPath = window.location.hash;
+				var navLinks = document.querySelectorAll('.app-nav a');
+				
+				navLinks.forEach(function(link) {
+					link.classList.remove('active');
+				});
+				
+				if (currentPath.startsWith('#/en/') || currentPath === '#/en') {
+					var englishLink = document.querySelector('.app-nav a[href="#/en/index"]');
+					if (englishLink) englishLink.classList.add('active');
+				} else {
+					var spanishLink = document.querySelector('.app-nav a[href="#/es/index"]');
+					if (spanishLink) spanishLink.classList.add('active');
+				}
+			}
+			
+			// Manejar rutas y redirecciones
+			hook.init(function() {
+				var currentPath = window.location.hash;
+				
+				// Si no hay hash o es la raíz, redirigir a español
+				if (!currentPath || currentPath === '#' || currentPath === '#/') {
+					window.location.hash = '#/es/';
+					return;
+				}
+				
+				// Si está en /en/ sin página específica, ir a index
+				if (currentPath === '#/en/' || currentPath === '#/en') {
+					window.location.hash = '#/en/index';
+					return;
+				}
+				
+				// Si está en /es/ sin página específica, ir a index  
+				if (currentPath === '#/es/' || currentPath === '#/es') {
+					window.location.hash = '#/es/index';
+					return;
+				}
+			});
+			
+			hook.ready(function() {
+				setTimeout(updateActiveNav, 100);
+			});
+			
+			hook.doneEach(function() {
+				updateActiveNav();
+			});
+		}, window.$docsify.plugins || []);
+	</script>
 </body>
 
 </html>

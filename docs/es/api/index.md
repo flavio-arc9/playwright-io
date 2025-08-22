@@ -29,6 +29,6 @@ test('Mi test móvil', async () => {
 
 ## 📚 Secciones de la API
 
-- **[🎭 Fixtures](api/fixture.md)** - Fixtures extendidas (`driver`, `page`)
-- **[🔧 Métodos](api/method.md)** - Métodos y utilidades disponibles
+- **[🎭 Fixtures](es/api/fixture.md)** - Fixtures extendidas (`driver`, `page`)
+- **[🔧 Métodos](es/api/method.md)** - Métodos y utilidades disponibles
 

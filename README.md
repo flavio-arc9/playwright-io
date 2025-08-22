@@ -1,6 +1,6 @@
 <div align="center">
-  <a href="https://vitalets.github.io/playwright-bdd">
-    <img width="128" alt="playwright-bdd" src="./docs/logo.svg">
+  <a href="https://flavio-arc9.github.io/playwright-io">
+    <img width="128" alt="playwright-io" src="./docs/logo.svg">
   </a>
 </div>
 
@@ -92,11 +92,11 @@ Para más detalles y ejemplos avanzados, revisa la carpeta `docs/` del proyecto.
 
 ## Changelog
 
-Consulta los últimos cambios en el [CHANGELOG.md](https://github.com/flavio-arc9/playwright-io/blob/main/CHANGELOG.md).
+Consulta los últimos cambios en el [CHANGELOG.md](CHANGELOG.md).
 
 ## Licencia
 
-Este proyecto está bajo la licencia [MIT](https://github.com/flavio-arc9/playwright-io/blob/main/LICENSE).
+Este proyecto está bajo la licencia [MIT](LICENSE).
 
 
 <p align="center">

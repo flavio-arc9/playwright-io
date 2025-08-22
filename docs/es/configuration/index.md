@@ -25,6 +25,6 @@ export default defineConfig<TestOptions>({
 
 ## Guías de Configuración
 
-1. **[📱 Configuración de Proyectos](projects.md)** - Global, por proyectos y ejecución paralela
-2. **[🔧 Opciones Disponibles](options.md)** - Todas las opciones de configuración de playwright-io
-3. **[🧪 Escribir Primera Prueba](getting-started/write-first-test.md)** - Usar la configuración en tests
+1. **[📱 Configuración de Proyectos](es/projects.md)** - Global, por proyectos y ejecución paralela
+2. **[🔧 Opciones Disponibles](es/options.md)** - Todas las opciones de configuración de playwright-io
+3. **[🧪 Escribir Primera Prueba](es/getting-started/write-first-test.md)** - Usar la configuración en tests

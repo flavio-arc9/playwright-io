@@ -27,15 +27,15 @@ Tu configuración actual seguirá funcionando. Para nuevas características:
 ```typescript
 // playwright.config.ts
 export default defineConfig<TestOptions>({
-  workers: 4,              // ✅ Ejecución paralela
-  use: {
-    // Tu configuración actual...
-    capabilities: { /* ... */ },
-    
-    // ✅ Nuevas opciones (opcionales)
-    recordingScreen: true,
-    takeScreenshot: true
-  }
+	workers: 4,              // ✅ Ejecución paralela
+	use: {
+		// Tu configuración actual...
+		capabilities: { /* ... */ },
+		
+		// ✅ Nuevas opciones (opcionales)
+		recordingScreen: true,
+		takeScreenshot: true
+	}
 });
 ```
 
@@ -45,12 +45,12 @@ Todo tu código actual funcionará igual. Opcionalmente puedes usar el driver gl
 ```typescript
 // Antes (sigue funcionando)
 test('mi test', async ({ driver }) => {
-  await driver.$('#button').click();
+  	await driver.$('#button').click();
 });
 
 // Nuevo (opcional)
 test('mi test', async () => {
-  await driver.$('#button').click(); // Sin fixture
+  	await driver.$('#button').click(); // Sin fixture
 });
 ```
 
@@ -62,12 +62,12 @@ Verifica que tengas la configuración básica:
 ```typescript
 // playwright.config.ts
 export default defineConfig({
-  use: {
-    capabilities: {
-      platformName: 'Android', // o 'iOS'
-      // ... tus capabilities
-    }
-  }
+	use: {
+		capabilities: {
+			platformName: 'Android', // o 'iOS'
+			// ... tus capabilities
+		}
+	}
 });
 ```
 
@@ -77,8 +77,8 @@ Agrega el tipo global:
 ```json
 // tsconfig.json
 {
-  "compilerOptions": {
-    "types": ["playwright-io", "@playwright/test"]
-  }
+	"compilerOptions": {
+		"types": ["playwright-io", "@playwright/test"]
+	}
 }
 ```

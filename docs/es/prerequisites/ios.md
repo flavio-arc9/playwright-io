@@ -32,4 +32,4 @@ xcode-select -p
 
 Una vez completada la configuración iOS:
 
-- **[📦 Instalar Playwright-IO](getting-started/installation.md)** - Instalar el paquete principal
+- **[📦 Instalar Playwright-IO](es/getting-started/installation.md)** - Instalar el paquete principal

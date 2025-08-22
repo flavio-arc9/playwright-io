@@ -174,4 +174,4 @@ sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3"
 
 Una vez completada la configuración del Android SDK:
 
-- **[📦 Instalar Playwright-IO](getting-started/installation.md)** - Instalar el paquete principal
+- **[📦 Instalar Playwright-IO](es/getting-started/installation.md)** - Instalar el paquete principal

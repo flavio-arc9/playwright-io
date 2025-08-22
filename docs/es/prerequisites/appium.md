@@ -82,6 +82,6 @@ appium-doctor --ios
 
 Una vez completada la instalación de Appium 2:
 
-- **[🤖 Configurar Android](android.md)** - Configurar Android SDK y dispositivos
-- **[🍎 Configurar iOS](ios.md)** - Configurar Xcode y dispositivos iOS
-- **[📦 Instalar Playwright-IO](../getting-started/installation.md)** - Instalar el paquete principal
+- **[🤖 Configurar Android](es/prerequisites/android.md)** - Configurar Android SDK y dispositivos
+- **[🍎 Configurar iOS](es/prerequisites/ios.md)** - Configurar Xcode y dispositivos iOS
+- **[📦 Instalar Playwright-IO](es/getting-started/installation.md)** - Instalar el paquete principal

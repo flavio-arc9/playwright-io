@@ -1,14 +1,14 @@
-# 📝 Escribe tu Primera Prueba Móvil
+# 📝 Write Your First Mobile Test
 
-Siga los pasos a continuación para crear y ejecutar su primera prueba de automatización móvil con **playwright-io**.
+Follow the steps below to create and run your first mobile automation test with **playwright-io**.
 
-Esta guía utiliza TypeScript, pero también puedes usar JavaScript.
+This guide uses TypeScript, but you can also use JavaScript.
 
 ---
 
-## Paso 1: Crear Archivo de Configuración
+## Step 1: Create Configuration File
 
-Crea un archivo `playwright.config.ts` en la raíz de tu proyecto:
+Create a `playwright.config.ts` file in the root of your project:
 
 ```ts
 import { defineConfig } from "@playwright/test";
@@ -26,14 +26,14 @@ export default defineConfig<TestOptions>({
 });
 ```
 
-## Paso 2: Configurar Capabilities de tu Aplicación
+## Step 2: Configure Your Application Capabilities
 
-> Para este ejemplo usaremos la **WebDriverIO Demo App** que puedes descargar aquí:
-> 📥 **[Descargar APK/IPA](https://github.com/webdriverio/native-demo-app/releases/tag/v1.0.8)**
+> For this example we'll use the **WebDriverIO Demo App** which you can download here:
+> 📥 **[Download APK/IPA](https://github.com/webdriverio/native-demo-app/releases/tag/v1.0.8)**
 
-Crea proyectos según el dispositivo que va a realizar pruebas:
+Create projects according to the device you'll be testing:
 
-**Para Android:**
+**For Android:**
 ```ts
 {
     name: 'Android App',
@@ -41,7 +41,7 @@ Crea proyectos según el dispositivo que va a realizar pruebas:
         capabilities: {
             platformName: 'Android',
             "appium:automationName": "UiAutomator2",
-            "appium:udid": "<REEMPLACE_AQUI>",
+            "appium:udid": "<REPLACE_HERE>",
             "appium:appPackage": "com.wdiodemoapp",
             "appium:appActivity": ".MainActivity"
         }
@@ -49,7 +49,7 @@ Crea proyectos según el dispositivo que va a realizar pruebas:
 }
 ```
 
-**Para iOS:**
+**For iOS:**
 ```ts
 {
     name: 'iOS App',
@@ -57,19 +57,19 @@ Crea proyectos según el dispositivo que va a realizar pruebas:
         capabilities: {
             platformName: 'iOS',
             "appium:automationName": "XCUITest",
-            "appium:udid": "<REEMPLACE_AQUI>",
+            "appium:udid": "<REPLACE_HERE>",
             "appium:bundleId": "org.reactjs.native.example.wdiodemoapp"
         }
     }
 }
 ```
 
-> 💡 **Nota:** Lee la sección de **[Inspección de Dispositivos](prerequisites/device-inspection.md)** para obtener el UDID, appPackage, appActivity y bundleId.
+> 💡 **Note:** Read the **[Device Inspection](prerequisites/device-inspection.md)** section to get the UDID, appPackage, appActivity and bundleId.
 
 
-## Paso 3: Crear Page Object (Recomendado)
+## Step 3: Create Page Object (Recommended)
 
-Crea la carpeta `tests/pageobjects/` y el archivo `LoginPage.ts`:
+Create the `tests/pageobjects/` folder and the `LoginPage.ts` file:
 
 ```ts
 import { Page } from "playwright-io";
@@ -88,7 +88,7 @@ export class LoginPage {
     readonly alertMessage;
 
     constructor(private page: Page) {
-        // Selectores usando accessibility IDs
+        // Selectors using accessibility IDs
         this.loginContainer = page.locator$('~button-login-container');
         this.signUpContainer = page.locator$('~button-sign-up-container');
         this.emailInput = page.locator$('~input-email');
@@ -99,7 +99,7 @@ export class LoginPage {
         this.loginScreen = page.locator$('~Login-screen');
         this.signUpScreen = page.locator$('~Sign-up-screen');
         
-        // Selectores cross-platform para alertas
+        // Cross-platform selectors for alerts
         this.alertTitle = page.selector({
             android: '*//android.widget.TextView[@resource-id="android:id/alertTitle"]',
             ios: '-ios predicate string:type == "XCUIElementTypeAlert"'
@@ -154,9 +154,9 @@ export class LoginPage {
 }
 ```
 
-## Paso 4: Crear tu Archivo de Prueba
+## Step 4: Create Your Test File
 
-Crea el archivo `tests/login.spec.ts`:
+Create the `tests/login.spec.ts` file:
 
 ```ts
 import { expect, test } from "playwright-io";
@@ -196,28 +196,28 @@ test.describe('Login Tests', { tag: '@login' }, () => {
 });
 ```
 
-> 💡 **Nota:** Puedes acceder a `driver` globalmente o desde el fixture, pero es buena práctica usar el fixture. Como alternativa, usa `page.io` para acceder a métodos específicos de WebDriver.
+> 💡 **Note:** You can access `driver` globally or from the fixture, but it's good practice to use the fixture. Alternatively, use `page.io` to access WebDriver-specific methods.
 
-## Paso 5: Ejecutar tu Prueba
+## Step 5: Run Your Test
 
-### **Ejecutar todas las pruebas:**
+### **Run all tests:**
 ```bash
 npm run test
-# o
+# or
 npx playwright test
 ```
 
-### **Ejecutar solo las pruebas de login:**
+### **Run only login tests:**
 ```bash
 npx playwright test login.spec.ts
 ```
 
-### **Ejecutar con tags específicos:**
+### **Run with specific tags:**
 ```bash
 npx playwright test --grep "@login"
 ```
 
-#### **✅ Prueba exitosa:**
+#### **✅ Successful test:**
 ```bash
 Running 2 tests using 1 worker
 
@@ -227,7 +227,7 @@ Running 2 tests using 1 worker
   2 passed (28.5s)
 ```
 
-### **Ver reporte en HTML:**
+### **View HTML report:**
 ```bash
 npx playwright show-report
 ```
@@ -236,4 +236,4 @@ HTML report:
 
 ![Playwright HTML report](./_media/playwright-report.png ':size=100%')
 
-¡Felicidades! 🎉 Has creado y ejecutado tu primera prueba de automatización móvil con **playwright-io**.
+Congratulations! 🎉 You have created and run your first mobile automation test with **playwright-io**.

@@ -9,5 +9,5 @@ Este tutorial te introduce a los fundamentos de la automatización móvil con Pl
 - **Escritura de pruebas** con Page Object Model
 - **Ejecución de tests** y generación de reportes HTML
 
-Continúa con la [instalación](getting-started/installation.md).
+Continúa con la [instalación](es/getting-started/installation.md).
 

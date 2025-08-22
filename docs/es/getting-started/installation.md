@@ -6,7 +6,7 @@ Comience instalando Playwright-IO utilizando su gestor de paquetes preferido.
 
 > ⚠️ **¡Importante - Lea Primero!**
 > 
-> Antes de instalar Playwright-IO, asegúrese de revisar y completar los **[Pre-requisitos](prerequisites/index.md)** para configurar correctamente su entorno de desarrollo móvil (Appium 2, Android SDK, iOS/Xcode).
+> Antes de instalar Playwright-IO, asegúrese de revisar y completar los **[Pre-requisitos](es/prerequisites/index.md)** para configurar correctamente su entorno de desarrollo móvil (Appium 2, Android SDK, iOS/Xcode).
 
 ## 🚀 Instalación Rápida
 
@@ -42,4 +42,4 @@ npx playwright install
 
 Para completar su configuración:
 
-- 🚀 **[Primeras Pruebas](getting-started/write-first-test.md)** - Cree su primera prueba automatizada
+- 🚀 **[Primeras Pruebas](es/getting-started/write-first-test.md)** - Cree su primera prueba automatizada

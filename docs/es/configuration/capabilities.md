@@ -3,7 +3,7 @@
 
 Las **capabilities** son configuraciones que definen las características del dispositivo y la aplicación que queremos automatizar. Son **obligatorias** para establecer la conexión con el dispositivo.
 
-> **📱 Obtención de datos:** Para obtener los valores correctos de UDID, appPackage, bundleId, etc., consulta la guía de [**Inspección de Dispositivos**](../prerequisites/device.md).
+> **📱 Obtención de datos:** Para obtener los valores correctos de UDID, appPackage, bundleId, etc., consulta la guía de [**Inspección de Dispositivos**](es/prerequisites/device.md).
 
 ---
 
@@ -110,6 +110,6 @@ El `automationName` define qué **driver de Appium** se utilizará para la autom
 
 ## 📚 Referencias
 
-- **[📱 Inspección de Dispositivos](prerequisites/device.md)** - Cómo obtener UDIDs, appPackage, bundleId
-- **[🔧 Configuración de Proyectos](configuration/projects.md)** - Usar capabilities en playwright.config.ts
+- **[📱 Inspección de Dispositivos](es/prerequisites/device.md)** - Cómo obtener UDIDs, appPackage, bundleId
+- **[🔧 Configuración de Proyectos](es/configuration/projects.md)** - Usar capabilities en playwright.config.ts
 - **[📖 Documentación de Appium](https://appium.io/docs/en/2.0/guides/caps/)** - Capabilities completas de Appium

@@ -1,5 +1,3 @@
-<!-- this file differs from README.md in project root -->
-
 <div align="center">
   <a href="/">
     <img width="128" alt="Playwright-IO" src="logo.svg">
@@ -15,7 +13,7 @@ Automatización móvil con [Playwright](https://playwright.dev/) runner y [WebDr
 </div>
 
 ## Inicio Rapido
-Consulta la guía de [inicio rápido](getting-started/installation.md) o lee a continuación la descripción general del proyecto Playwright-IO.
+Consulta la guía de [inicio rápido](es/getting-started/installation.md) o lee a continuación la descripción general del proyecto Playwright-IO.
 
 ## ¿Por qué Automatización Móvil?
 En la era de las aplicaciones móviles, necesitas herramientas que combinen lo mejor de ambos mundos:
