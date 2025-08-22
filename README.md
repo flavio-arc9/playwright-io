@@ -10,6 +10,8 @@
 
 [![npm version](https://img.shields.io/npm/v/playwright-io)](https://www.npmjs.com/package/playwright-io)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-blue.svg)](https://www.typescriptlang.org/)
+[![npm downloads](https://img.shields.io/npm/dw/playwright-io)](https://www.npmjs.com/package/playwright-io)
+[![GitHub issues](https://img.shields.io/github/issues/flavio-arc9/playwright-io)](https://github.com/flavio-arc9/playwright-io/issues)
 [![license](https://img.shields.io/npm/l/playwright-io)](https://github.com/flavio-arc9/playwright-io/blob/main/LICENSE)
 
 </div>
