@@ -90,6 +90,18 @@ Para asegurar integración óptima entre el test runner de Playwright y las capa
 
 Para más detalles y ejemplos avanzados, revisa la carpeta `docs/` del proyecto.
 
+## 🙏 Agradecimientos
+
+Este proyecto no habría sido posible sin la inspiración y el trabajo de increíbles desarrolladores de la comunidad:
+
+### **WebDriverIO Team**
+Un agradecimiento especial al equipo de [WebDriverIO](https://webdriver.io/) por el excelente trabajo en el **wdio-video-reporter** y la lógica de grabación de videos que hemos adaptado para esta librería. Su implementación robusta y bien documentada fue fundamental para integrar las capacidades de grabación de pantalla en el contexto de Playwright.
+
+### **Vitaliy Potapov (@vitalets)**
+Profundo agradecimiento a [Vitaliy Potapov](https://github.com/vitalets) por su inspiración y enfoque en la documentación. Su trabajo en proyectos como [playwright-bdd](https://github.com/vitalets/playwright-bdd) y su estilo de documentación clara y comprensible sirvieron como modelo para esta librería. Su estructura de proyecto y metodología de documentación han sido adoptadas con gran respeto por su claridad y facilidad de comprensión.
+
+Estos proyectos y desarrolladores demuestran la fuerza de la comunidad open source y cómo el trabajo colaborativo puede crear herramientas excepcionales para todos.
+
 ## Changelog
 
 Consulta los últimos cambios en el [CHANGELOG.md](CHANGELOG.md).
@@ -100,12 +112,12 @@ Este proyecto está bajo la licencia [MIT](LICENSE).
 
 
 <p align="center">
-<a href="https://github.com/webdriverio/webdriverio#nastyox">
+<a href="https://github.com/flavio-arc9/playwright-io">
 <img src="http://randojs.com/images/barsSmall.gif" alt="Animated footer bars" width="100%"/></a>
 </p>
 <br/>
 <p align="center">
-<a href="https://github.com/webdriverio/webdriverio#">
+<a href="https://github.com/flavio-arc9/playwright-io">
 <img src="http://randojs.com/images/backToTopButton.png" alt="Back to top" height="29"/>
 </a>
 </p>
