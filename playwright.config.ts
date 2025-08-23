@@ -24,6 +24,12 @@ export default defineConfig<TestOptions>({
         }
     },
     projects: [
+        {   
+            name: 'Playwright Desktop Chrome',
+            use: {
+                ...devices['Desktop Chrome']
+            }
+        },
         {
             name: 'WebdriverIO Android 2',
             use: {

@@ -5,6 +5,17 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 y este proyecto se adhiere al [Versionado Semántico](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2025-08-22
+
+### 🔧 Mejorado
+- **Gestión de Estado Global**: Estado global movido a las sesiones para mejor aislamiento y control
+- **Testing Híbrido**: Soporte mejorado para ejecutar tanto tests de Playwright puro como tests móviles en el mismo proyecto
+
+### 🐛 Corregido
+- **Fixtures Condicionales**: Los fixtures del driver ahora se saltan correctamente cuando no hay sesión móvil válida
+- **Tests de Ejemplo**: Corrección en las pruebas de ejemplo para manejar correctamente las sesiones de Playwright
+- **Inicialización de Driver**: Prevención de errores cuando se ejecutan tests web sin capabilities móviles
+
 ## [1.0.1] - 2025-08-21
 
 ### 🚀 Agregado

@@ -137,6 +137,7 @@ export class Session {
             helpers.setCapability(this.config.capabilities);
 
             this.driver = await remote(this.config);
+            global.driver = this.driver;
 
             const recordingConfig = this.testInfo.recordingScreen;
             const isRecordingEnabled = recordingConfig === true || (typeof recordingConfig === 'object' && recordingConfig !== null);
@@ -172,6 +173,7 @@ export class Session {
             }
 
             await this.driver.deleteSession();
+            global.driver = undefined as any;
         }, { box: true });
     }
 }

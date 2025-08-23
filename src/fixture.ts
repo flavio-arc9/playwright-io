@@ -99,15 +99,16 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
      */
     driver: [
         async ({ _useSession }, use) => {
-            if (!_useSession) throw new Error('❌ No active session found');
+            if (!_useSession) {
+                await use(undefined as any)
+                return;
+            }
 
             driver = await _useSession.createSession();
-            
-            global.driver = driver;
+
             await use(driver);
-            
+
             if (driver) await _useSession.deleteSession();
-            global.driver = undefined as any;
         },
         { scope: 'test' }
     ],

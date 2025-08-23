@@ -1,10 +1,7 @@
-import { devices, test, expect, Page } from '../src';
+import { Locator } from '@playwright/test';
+import { devices, test, expect } from '../src/index';
 
 test.use({ ...devices['Desktop Chrome'] });
-
-test.beforeEach(async ({ page }) => {
-    await page.goto('https://demo.playwright.dev/todomvc');
-});
 
 const TODO_ITEMS = [
     'buy some cheese',
@@ -15,10 +12,14 @@ const TODO_ITEMS = [
 test.describe('Playwright Browser',{tag: '@playwright'}, () => {
 
     test('Demo Test', async ({ page }) => {
-        await page.goto('https://playwright.dev/');
-        await page.locator('//a[@href="/docs/intro"]').first().click();
+        const element: Locator = page.locator('//a[@href="/docs/intro"]');
+        console.log('Element found:', element);
 
-        let btn = page.locator('//a[@href="/docs/intro"]').first()
+
+        await page.goto('https://playwright.dev/');
+        await element.first().click();
+
+        let btn = element.first()
         await btn.waitFor({ state: 'visible' });
         await btn.click();
         await page.waitForTimeout(2000);
@@ -35,9 +36,12 @@ test.describe('Playwright Browser',{tag: '@playwright'}, () => {
         await input.fill('Playwright');
         await input.press('Enter');
 
+        await page.click('text=Playwright');
     })
 
     test('should allow me to add todo items', async ({ page }) => {
+        await page.goto('https://demo.playwright.dev/todomvc');
+
         // create a new todo locator
         const newTodo = page.getByPlaceholder('What needs to be done?');
 
@@ -63,6 +67,8 @@ test.describe('Playwright Browser',{tag: '@playwright'}, () => {
     });
 
     test('should clear text input field when an item is added', async ({ page }) => {
+        await page.goto('https://demo.playwright.dev/todomvc');
+
         // create a new todo locator
         const newTodo = page.getByPlaceholder('What needs to be done?');
 
@@ -75,6 +81,8 @@ test.describe('Playwright Browser',{tag: '@playwright'}, () => {
     });
 
     test('should allow me to mark items as complete', async ({ page }) => {
+        await page.goto('https://demo.playwright.dev/todomvc');
+
         // create a new todo locator
         const newTodo = page.getByPlaceholder('What needs to be done?');
 
@@ -100,6 +108,8 @@ test.describe('Playwright Browser',{tag: '@playwright'}, () => {
     });
     
     test('should display the current number of todo items', async ({ page }) => {
+        await page.goto('https://demo.playwright.dev/todomvc');
+        
         // create a new todo locator
         const newTodo = page.getByPlaceholder('What needs to be done?');
 
