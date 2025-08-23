@@ -1,6 +1,6 @@
 {
 	"name": "playwright-io",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Mobile Testing with Playwright runner",
 	"license": "MIT",
 	"author": "Flavio Romero",
