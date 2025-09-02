@@ -1,7 +1,8 @@
-import { IOCapabilities, IOConfig, Page, RecorderOptions, TestOptions } from "."
-import { Browser as ExtendBrowser } from "webdriverio";
-import { PlaywrightTestArgs, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from "@playwright/test";
-import { Session } from "../session";
+import type { Page, TestOptions } from "."
+import type { Browser as ExtendBrowser } from "webdriverio";
+import type { PlaywrightTestArgs, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from "@playwright/test";
+import type { Session } from "../session";
+import type { Services } from "../services";
 
 
 /**
@@ -38,14 +39,15 @@ export interface TestArgs extends TestOptions, PlaywrightTestArgs {
  * These are not exposed in the public API but are used for configuration merging.
  */
 export interface HiddenTestArgs {
-    _useCapabilities: IOCapabilities;
-    _useConfig: IOConfig;
+    _useDefaultObject: object;
+    _useDefaultBoolean: boolean;
+    _useDefaultArray: Array<any>;
     _useSession?: Session;
-    _useRecordingScreen: RecorderOptions | boolean;
-    _useTakeScreenshot: boolean;
 }
 
 /**
  * Worker arguments
  */
-export type WorkerArgs = PlaywrightWorkerArgs & PlaywrightWorkerOptions;
+export interface WorkerArgs extends PlaywrightWorkerArgs, PlaywrightWorkerOptions {
+    workerServices: Services;
+}
