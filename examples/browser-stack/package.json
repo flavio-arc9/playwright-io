@@ -1,0 +1,15 @@
+{
+    "name": "browser-stack",
+    "scripts": {
+        "test": "npx playwright test"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.49.1",
+        "@types/node": "^22.13.9",
+        "playwright-io": "^1.0.2",
+        "tsx": "^4.19.3"
+    },
+    "dependencies": {
+        "@wdio/browserstack-service": "^9.12.6"
+    }
+}
