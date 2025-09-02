@@ -4,6 +4,15 @@
 	"description": "Mobile Testing with Playwright runner",
 	"license": "MIT",
 	"author": "Flavio Romero",
+	"type": "module",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"types": "./dist/index.d.ts",
+	"main": "./dist/index.js",
 	"engines": {
 		"node": ">=18.20.0"
 	},
@@ -19,8 +28,6 @@
 		"playwright-io",
 		"playwright-webdriverio"
 	],
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/flavio-arc9/playwright-io.git"
@@ -38,6 +45,8 @@
 	},
 	"devDependencies": {
 		"@types/node": "^22.10.7",
+		"@wdio/appium-service": "^9.19.2",
+		"appium": "^3.0.1",
 		"typescript": "~5.8.2"
 	},
 	"peerDependencies": {
@@ -45,6 +54,7 @@
 	},
 	"dependencies": {
 		"@ffmpeg-installer/ffmpeg": "^1.1.0",
+		"@wdio/utils": "^9.19.2",
 		"glob": "^11.0.3",
 		"webdriverio": "latest"
 	}
