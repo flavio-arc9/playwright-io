@@ -1,6 +1,6 @@
 import { test, expect } from '../src';
 
-test('WebdriverIO Android & IOS pararel projects', async ({ page, driver }) => {
+test('WebdriverIO Android & IOS pararel projects', { tag: '@pararel' } , async ({ page, driver }) => {
     //Lanzar los dos proyecto Android e IOS
     const screenLogin = page.locator$('~Login-screen');
 
