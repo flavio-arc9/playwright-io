@@ -1,11 +1,12 @@
 import { Context } from './types';
-export { defineConfig, devices, expect } from '@playwright/test';
-export * from './types'; 
-export * from './session';
-export * from './fixture';
-export * from './pages';
 
-export * as wdio from 'webdriverio';
+export * from 'webdriverio';
+
+export { defineConfig, devices, expect } from '@playwright/test';
+// export * from './session';
+export * from './fixture';
+// export * from './pages';
+export type * from './types';
 
 declare global {
     /**

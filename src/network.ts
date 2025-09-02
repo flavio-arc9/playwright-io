@@ -1,4 +1,4 @@
-import { Context, Page } from "./types";
+import { Context, Page } from ".";
 
 /**
  * Represents a captured network result from WebDriverIO.

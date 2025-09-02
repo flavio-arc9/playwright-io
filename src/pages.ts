@@ -1,7 +1,7 @@
 import { helpers } from "./helpers";
 import { NetworkInterceptor } from "./network";
-import { getSelector } from "./selector";
-import { Context, Page, Selector, WaitForElementOptions } from "./types";
+import { locators } from "./locators";
+import { Context, Page, Locators, WaitForElementOptions } from ".";
 
 export class Pages {
 
@@ -27,7 +27,7 @@ export class Pages {
             await this.setupPageContent();
         }
     }
-    
+
     /**
      * Rejects the current network interception session.
      */
@@ -82,49 +82,33 @@ export class Pages {
          */
         io: this.driver,
         /**
-         * Finds a single element using WebDriverIO locator syntax.
-         * @param locator - CSS selector, XPath, or WebDriverIO selector string
-         */
-        locator$: (locator: string) => this.driver.$(locator),
-
-        /**
-         * Finds multiple elements using WebDriverIO locator syntax.
-         * @param locator - CSS selector, XPath, or WebDriverIO selector string
-         */
-        locator$$: (locator: string) => this.driver.$$(locator),
-
-        /**
          * Finds a single element using platform-specific selectors.
-         * @param locator - String selector or Selector object with platform-specific options
+         * @param selector - String selector or Locator object with platform-specific options
          */
-        selector: (locator: string | Selector) => {
-            const resolvedSelector = getSelector(this.driver, locator);
-            return this.driver.$(resolvedSelector);
+        locator$: (selector: Locators) => {
+            const resolvedLocator = locators.get(this.driver, selector);
+            return this.driver.$(resolvedLocator);
         },
-
         /**
          * Finds multiple elements using platform-specific selectors.
-         * @param locator - String selector or Selector object with platform-specific options
+         * @param selector - String selector or Locator object with platform-specific options
          */
-        selectors: (locator: string | Selector) => {
-            const resolvedSelector = getSelector(this.driver, locator);
-            return this.driver.$$(resolvedSelector);
+        locator$$: (selector: Locators) => {
+            const resolvedLocator = locators.get(this.driver, selector);
+            return this.driver.$$(resolvedLocator);
         },
-
         /**
          * Waits for an element to meet specified conditions before returning it.
-         * @param locator - String selector or Selector object
+         * @param selector - String selector or Locator object
          * @param options - Wait conditions and timeout configuration
          */
         waitForElement: async (
-            locator: string | Selector,
+            selector: Locators,
             options: WaitForElementOptions = {}
         ) => {
-            const resolvedSelector = typeof locator === 'string'
-                ? locator
-                : getSelector(this.driver, locator);
+            const resolvedLocator = locators.get(this.driver, selector);
 
-            const element = this.driver.$(resolvedSelector);
+            const element = this.driver.$(resolvedLocator);
             const waitConfig = { ...Pages.DEFAULT_WAIT_OPTIONS, ...options };
 
             await element.waitForExist({ timeout: waitConfig.timeout });

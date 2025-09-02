@@ -1,6 +1,6 @@
 
-import { test } from "./fixture";
-import { Context, IOCapabilities } from "./types";
+import { test } from ".";
+import type { Capabilities } from "@wdio/types"
 
 /**
  * Test annotation utilities for adding metadata to Playwright test reports.
@@ -23,7 +23,7 @@ class Helper {
      * Adds each capability as a separate test annotation.
      * @param capabilities - The capabilities object used for the session
      */
-    public setCapability(capabilities: IOCapabilities): void {
+    public setCapability(capabilities: Capabilities.RequestedStandaloneCapabilities): void {
         for (const [key, value] of Object.entries(capabilities)) {
             test.info().annotations.push({
                 type: key,
