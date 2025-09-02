@@ -1,6 +1,5 @@
 
-import { test, expect, wdio } from '../src';
-const { Key } = wdio;
+import { test, expect, Key } from '../src';
 
 test.use({
     config: {
