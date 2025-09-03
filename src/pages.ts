@@ -3,6 +3,10 @@ import { NetworkInterceptor } from "./network";
 import { locators } from "./locators";
 import { Context, Page, Locators, WaitForElementOptions } from ".";
 
+/**
+ * Manages browser pages and provides utilities for interacting with them.
+ * This includes methods for navigating, interacting with elements, and waiting for conditions.
+ */
 export class Pages {
 
     private static readonly DEFAULT_WAIT_OPTIONS = {

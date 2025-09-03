@@ -1,13 +1,15 @@
 import { initializeLauncherService, initializeWorkerService, executeHooksWithArgs } from '@wdio/utils';
-import { Capabilities, Services as Service } from "@wdio/types";
+import { Services as Service } from "@wdio/types";
 import { WdioConfig } from './types';
 
 export class Services {
 
-    private workerServices: any[] = [];
+    private workerServices: Service.ServiceInstance[] = [];
     private launcherServices: Service.ServiceInstance[] = [];
     private ignoreServices: string[] = [];
     private isInitialized = false;
+
+    private static hookCache = new Map<string, Function[]>();
 
     constructor(private config: WdioConfig) { }
 
@@ -23,8 +25,6 @@ export class Services {
                 this.config,
                 this.config.capabilities
             );
-            console.log(`✅ Total de Launchers: ${launcherServices.length}`);
-            console.log(`ℹ️ Total de workers: ${ignoredWorkerServices.join(', ')}`);
 
             this.launcherServices = launcherServices;
             this.ignoreServices = ignoredWorkerServices;
@@ -33,12 +33,17 @@ export class Services {
     }
 
     async execLauncher(hookName: string, args?: unknown[]) {
-        const hooks = this.launcherServices
-            .filter(service => typeof (service as any)[hookName] === 'function')
-            .map(service => ((service as any)[hookName] as Function).bind(service));
+        const cacheKey = `launcher-${hookName}`;
+        
+        if (!Services.hookCache.has(cacheKey)) {
+            const hooks = this.launcherServices
+                .filter(service => typeof (service as any)[hookName] === 'function')
+                .map(service => ((service as any)[hookName] as Function).bind(service));
+            Services.hookCache.set(cacheKey, hooks);
+        }
 
+        const hooks = Services.hookCache.get(cacheKey) || [];
         if (hooks.length > 0) {
-            console.log(`🎯 Executing ${hooks.length} ${hookName} hooks...`);
             return await executeHooksWithArgs(hookName, hooks, args);
         }
         return [];
@@ -50,16 +55,20 @@ export class Services {
             this.config.capabilities[0] as any,
             this.ignoreServices
         );
-        console.log(`✅ Total Workers: ${this.workerServices.length} services`);
     }
 
     async execWorker(hookName: string, args?: unknown[]) {
-        const hooks = this.workerServices
-            .filter(service => typeof (service as any)[hookName] === 'function')
-            .map(service => ((service as any)[hookName] as Function).bind(service));
+        const cacheKey = `worker-${hookName}`;
+        
+        if (!Services.hookCache.has(cacheKey)) {
+            const hooks = this.workerServices
+                .filter(service => typeof (service as any)[hookName] === 'function')
+                .map(service => ((service as any)[hookName] as Function).bind(service));
+            Services.hookCache.set(cacheKey, hooks);
+        }
 
+        const hooks = Services.hookCache.get(cacheKey) || [];
         if (hooks.length > 0) {
-            console.log(`🎯 Executing ${hooks.length} ${hookName} hooks...`);
             return await executeHooksWithArgs(hookName, hooks, args);
         }
         return [];
@@ -67,42 +76,8 @@ export class Services {
 
     async cleanup() {
         if (!this.isInitialized) return;
-
-        console.log('✅ Cleanup completed');
         this.isInitialized = false;
         this.ignoreServices = [];
-    }
-
-    getAvailableHooks(): string[] {
-        const hookNames = new Set<string>();
-
-        this.workerServices.forEach(service => {
-            Object.getOwnPropertyNames(Object.getPrototypeOf(service)).forEach(prop => {
-                if (typeof service[prop] === 'function') {
-                    hookNames.add(prop);
-                }
-            });
-        });
-
-        return Array.from(hookNames).sort();
-    }
-
-    debugServicesAndHooks() {
-        console.log('\n🔍 Services Debug Information:');
-        console.log('='.repeat(50));
-
-        this.workerServices.forEach((service, index) => {
-            const serviceName = service.constructor.name || `Service${index}`;
-            const hooks = Object.getOwnPropertyNames(Object.getPrototypeOf(service))
-                .filter(prop => typeof service[prop] === 'function');
-
-            console.log(`📦 ${serviceName}:`);
-            if (hooks.length > 0) {
-                hooks.forEach(hook => console.log(`   🎯 ${hook}`));
-            } else {
-                console.log('   (no hooks implemented)');
-            }
-            console.log('');
-        });
+        Services.hookCache.clear();
     }
 }

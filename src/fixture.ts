@@ -5,15 +5,21 @@ import { Session } from './session';
 import { Services } from './services';
 
 /**
- * Global WebDriverIO driver instance available throughout the test execution.
+ * Global WebDriverIO driver instance accessible throughout test execution.
  */
 export let driver: Context;
 
 /**
- * Extended Playwright test with WebDriverIO integration.
- * Provides fixtures for config, capabilities, driver, page, and session management.
+ * Extended Playwright test framework with integrated WebDriverIO support.
+ * Provides fixtures for configuration, capabilities, driver management, 
+ * page objects, services, and session lifecycle management.
  */
 const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
+    /**
+     * Worker-scoped services that manage service lifecycle across test workers.
+     * Handles preparation, worker start/end, and completion phases.
+     * @returns The worker services instance.
+     */
     workerServices: [
         async ({ }, use, testInfo) => {
             const options = testInfo.project.use as TestOptions
@@ -28,25 +34,34 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
             const services = new Services(config);
 
             await services.initLauncher();
-            console.info('Run onPrepare hook')
             await services.execLauncher('onPrepare', [config, [options.capabilities]]);
-
-            console.info('Run onWorkerStart hook')
             await services.execLauncher('onWorkerStart', [cid, options.capabilities, [], {}, []]);
 
             await use(services);
 
-            console.info('Run onWorkerEnd hook')
             await services.execLauncher('onWorkerEnd', [cid, 0, [], 0]);
-
-            console.info('Run onComplete hook')
             await services.execLauncher('onComplete', [0, config, [options.capabilities], 0]);
             await services.cleanup();
         },
         { scope: 'worker', title: 'Launcher Services', auto: true }
     ],
     /**
-     * Merges the provided configuration with the project-specific configuration.
+     * Merges project and test-specific service configurations.
+     * This allows for dynamic configuration based on the test environment.
+     * @returns The merged services array.
+     */
+    services: [
+        async ({ _useDefaultArray }, use, testInfo) => {
+            const merge = {
+                ...(testInfo.project.use as TestOptions).services,
+                ..._useDefaultArray,
+            }
+            await use(merge);
+        },
+        { scope: 'test' }
+    ],
+    /**
+     * Merges project and test-specific WebDriverIO configuration settings.
      * This allows for dynamic configuration based on the test environment.
      * @returns The merged configuration object.
      */
@@ -60,18 +75,8 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
         },
         { scope: 'test' },
     ],
-    services: [
-        async ({ _useDefaultArray }, use, testInfo) => {
-            const merge = {
-                ...(testInfo.project.use as TestOptions).services,
-                ..._useDefaultArray,
-            }
-            await use(merge);
-        },
-        { scope: 'test' }
-    ],
     /**
-     * Merges the provided capabilities with the project-specific capabilities.
+     * Merges project and test-specific browser/device capabilities.
      * This allows for dynamic capabilities based on the test environment.
      * @returns The merged capabilities object.
      */
@@ -121,10 +126,8 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
         { scope: 'test' }
     ],
     /**
-     * Creates a WebDriverIO session based on the provided configuration and capabilities.
-     * This fixture is used to manage the WebDriverIO session lifecycle.
-     * The driver instance is also made available globally.
-     * @param _useSession  The session management object containing configuration and capabilities
+     * Creates and manages WebDriverIO session with integrated service hooks.
+     * Handles initialization, test execution, cleanup, and global driver access.
      * @returns driver The created WebDriverIO driver instance
      */
     driver: [
@@ -138,31 +141,21 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
 
             await workerServices.initWorker();
 
-            console.info('Run beforeSession hook');
             await workerServices.execWorker('beforeSession', [config, capabilities, [], cid]);
 
             driver = await _useSession.createSession();
 
-            console.info('Run before hook');
             await workerServices.execWorker('before', [capabilities, [], driver]);
             const suite = {
                 type: 'suite',
                 title: testInfo.title,
-                // parent: testInfo.parent,
-                // fullTitle: testInfo.fullTitle,
-                // pending: testInfo.pending,
                 file: testInfo.file,
                 error: testInfo.error,
                 duration: testInfo.duration
             }
 
-            console.info(`Run beforeSuite hook`);
             await workerServices.execWorker('beforeSuite', [suite]);
-
-            console.info(`Run beforeTest hook`);
             await workerServices.execWorker('beforeTest', [base, testInfo]);
-
-            console.info(`Run beforeHook hook`);
             await workerServices.execWorker('beforeHook', [base, testInfo, 'beforeTest']);
 
             await use(driver);
@@ -177,28 +170,21 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
                 status: ''
             }
 
-            console.info(`Run afterHook hook`);
             await workerServices.execWorker('afterHook', [base, testInfo, testResult, 'afterTest']);
-
-            console.info(`Run afterTest hook`);
             await workerServices.execWorker('afterTest', [base, testInfo, testResult]);
-
-            console.info(`Run afterSuite hook`);
             await workerServices.execWorker('afterSuite', [suite]);
-
-            console.info(`Run afterSession hook`);
             await workerServices.execWorker('after', [0, capabilities, []]);
+            
             if (driver) await _useSession.deleteSession();
             driver = undefined as any;
 
-            console.info(`Run afterSession hook`);
             await workerServices.execWorker('afterSession', [config, capabilities, []]);
         },
         { scope: 'test' }
     ],
     /**
-     * Creates a new page within the WebDriverIO session.
-     * @param driver The WebDriverIO driver instance
+     * Enhanced page object with WebDriverIO integration.
+     * Falls back to standard Playwright page when driver unavailable.
      * @returns The created page instance
      */
     page: [
@@ -216,11 +202,8 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
         { scope: 'test' }
     ],
     /**
-     * Manages the WebDriverIO session lifecycle with integrated services.
-     * Uses both global services (worker scope) and test-specific services (test scope).
-     * @param config The WebDriverIO configuration object from test.use()
-     * @param capabilities The WebDriverIO capabilities object
-     * @returns Session instance managing the WebDriverIO session with services
+     * Internal session management that validates and creates WebDriverIO sessions.
+     * @returns Session instance managing the WebDriverIO session
      */
     _useSession: [
         async ({ config, capabilities, baseURL, services }, use, testInfo) => {
@@ -240,17 +223,20 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
         },
         { scope: 'test' }
     ],
+    // Internal fixture for providing default array values in test overrides
     _useDefaultArray: [[], { option: true }],
+    // Internal fixture for providing default object values in test overrides  
     _useDefaultObject: [{}, { option: true }],
+    // Internal fixture for providing default boolean values in test overrides
     _useDefaultBoolean: [false, { option: true }]
 })
 
 /**
- * Test fixture for managing WebDriverIO sessions.
+ * Extended Playwright test with WebDriverIO integration.
  */
 export const test = _test as TestType<TestArgs, WorkerArgs>;
 
 /**
- * Test information for a single test case.
+ * Type definition for the extended test fixture.
  */
 export type TestInfo = typeof test;

@@ -24,8 +24,6 @@ export class SimpleViewportLoggerService {
     before(config: any, specs: any, browser: WebdriverIO.Browser) {
         if (!this.options.enabled) return;
 
-        console.log("🎯 SimpleViewportLoggerService: Inicializando comandos de viewport");
-
         // Agregar el comando logToViewport al browser
         browser.addCommand(
             'logToViewport',
@@ -104,6 +102,6 @@ export class SimpleViewportLoggerService {
      * Worker Hook para cleanup
      */
     after(result: any, config: any, capabilities: any) {
-        console.log("🎯 SimpleViewportLoggerService: Limpieza completada");
+        // Cleanup silencioso
     }
 }
