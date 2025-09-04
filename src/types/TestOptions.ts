@@ -3,22 +3,22 @@ import { PlaywrightTestOptions } from "@playwright/test";
 
 /**
  * Test configuration options for Playwright-IO framework.
- * Extends Playwright's test functionality with WebDriverIO capabilities.
+ * Extends Playwright with WebDriverIO capabilities and automation services.
  */
 export interface TestOptions extends PlaywrightTestOptions, IOCapabilities {
     /**
-     * WebDriverIO session configuration
-     * https://webdriver.io/es/docs/configuration#opciones-de-webdriver
-     * https://webdriver.io/es/docs/configuration#webdriverio
-     * Ignores TestRunnerOptions & Hooks
+     * WebDriverIO configuration settings (timeouts, URLs, connection options).
+     * Excludes TestRunnerOptions & Hooks - handled by Playwright.
+     * @see https://webdriver.io/docs/configuration
      */
     config: Partial<IOConfig>;
-    /** List of WebDriverIO services to use during the session 
-     * Reescrito para su funcionamiento
-    */
+    
+    /** WebDriverIO services for automation tasks (logging, screenshots, reporting) */
     services: IOServices[];
-    /** Screen recording configuration - can be boolean (use defaults) or RecorderOptions object */
+    
+    /** Screen recording during test execution - boolean or detailed RecorderOptions */
     recordingScreen: RecorderOptions | boolean;
-    /** Enable automatic screenshot capture on test failures */
+    
+    /** Automatic screenshot capture on test failures */
     takeScreenshot: boolean;
 }

@@ -4,7 +4,6 @@ import type { PlaywrightTestArgs, PlaywrightWorkerArgs, PlaywrightWorkerOptions 
 import type { Session } from "../session";
 import type { Services } from "../services";
 
-
 /**
  * Context represents WebDriverIO's Browser instance, 
  * providing access to all WebDriverIO browser commands.
@@ -22,6 +21,7 @@ export interface TestArgs extends TestOptions, PlaywrightTestArgs {
      * See: https://webdriver.io/docs/api/browser
      */
     driver: Context
+    
     /**
      * Extended Playwright Page interface that adds limited WebDriverIO element selection capabilities.
      * 

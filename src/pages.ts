@@ -49,8 +49,9 @@ export class Pages {
 
     /**
      * Creates HTML content for mobile device viewer.
+     * @return HTML string for device viewer
      */
-    private devicesViewer(): string {
+    private devicesViewer() {
         const mjpegServerPort = (this.driver.capabilities as any)?.mjpegServerPort;
 
         return `
@@ -68,6 +69,7 @@ export class Pages {
 
     /**
      * Creates an extended page with WebDriverIO capabilities and network interception.
+     * @returns The extended page instance
      */
     get createExtends() {
         const extendedPage = Object.assign(this.page, { ...this.extensions() });
@@ -85,6 +87,7 @@ export class Pages {
          * @returns Context - The WebDriverIO context for the page
          */
         io: this.driver,
+
         /**
          * Finds a single element using platform-specific selectors.
          * @param selector - String selector or Locator object with platform-specific options
@@ -93,6 +96,7 @@ export class Pages {
             const resolvedLocator = locators.get(this.driver, selector);
             return this.driver.$(resolvedLocator);
         },
+
         /**
          * Finds multiple elements using platform-specific selectors.
          * @param selector - String selector or Locator object with platform-specific options
@@ -101,6 +105,7 @@ export class Pages {
             const resolvedLocator = locators.get(this.driver, selector);
             return this.driver.$$(resolvedLocator);
         },
+
         /**
          * Waits for an element to meet specified conditions before returning it.
          * @param selector - String selector or Locator object

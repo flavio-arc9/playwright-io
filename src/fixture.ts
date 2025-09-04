@@ -34,6 +34,8 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
             const services = new Services(config);
 
             await services.initLauncher();
+            await services.reportServiceStatus();
+
             await services.execLauncher('onPrepare', [config, [options.capabilities]]);
             await services.execLauncher('onWorkerStart', [cid, options.capabilities, [], {}, []]);
 

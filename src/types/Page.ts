@@ -1,7 +1,7 @@
 
-import { Page as OriginPage } from '@playwright/test';
-import { Context, Locators } from '.';
-import { ChainablePromiseArray, ChainablePromiseElement } from '../index';
+import type { Page as OriginPage } from '@playwright/test';
+import type { Context, Locators } from '.';
+import type { ChainablePromiseArray, ChainablePromiseElement } from '..';
 
 /**
  * Extended Playwright Page interface that adds limited WebDriverIO element selection capabilities.
@@ -13,6 +13,7 @@ export interface Page extends OriginPage {
      * @returns Context - The WebDriverIO context for the page
      */
     io: Context;
+
     /**
      * The `locator$` method finds an element using platform-specific locators.
      * 
@@ -39,6 +40,7 @@ export interface Page extends OriginPage {
      * ```
      */
     locator$: (selector: Locators) => ChainablePromiseElement;
+
     /**
      * The `locator$$` method finds multiple elements using platform-specific locators.
      *
@@ -67,6 +69,7 @@ export interface Page extends OriginPage {
      * ```
      */
     locator$$: (selector: Locators) => ChainablePromiseArray;
+    
     /**
      * The `waitForElement` method waits for an element using platform-specific locators.
      * 

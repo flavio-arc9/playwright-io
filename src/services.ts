@@ -2,6 +2,10 @@ import { initializeLauncherService, initializeWorkerService, executeHooksWithArg
 import { Services as Service } from "@wdio/types";
 import { WdioConfig } from './types';
 
+/**
+ * Manages WebDriverIO services lifecycle and hook execution.
+ * Handles both launcher-level and worker-level services with caching optimization.
+ */
 export class Services {
 
     private workerServices: Service.ServiceInstance[] = [];
@@ -9,14 +13,19 @@ export class Services {
     private ignoreServices: string[] = [];
     private isInitialized = false;
 
+    /** Cache for service hooks to improve performance */
     private static hookCache = new Map<string, Function[]>();
 
     constructor(private config: WdioConfig) { }
 
+    /** Checks if services are configured 
+     * @returns boolean indicating if services are present
+    */
     private isServices() {
         return this.config.services && this.config.services.length > 0;
     }
 
+    /** Initializes launcher-level services for worker preparation */
     async initLauncher() {
         if (this.isInitialized) { return }
 
@@ -32,6 +41,11 @@ export class Services {
         }
     }
 
+    /** Executes launcher-level service hooks with caching
+     * @param hookName - The name of the hook to execute
+     * @param args - Arguments to pass to the hook
+     * @returns Results from executing the hooks
+     */
     async execLauncher(hookName: string, args?: unknown[]) {
         const cacheKey = `launcher-${hookName}`;
         
@@ -49,6 +63,7 @@ export class Services {
         return [];
     }
 
+    /** Initializes worker-level services for test execution */
     async initWorker() {
         this.workerServices = await initializeWorkerService(
             this.config,
@@ -57,6 +72,11 @@ export class Services {
         );
     }
 
+    /** Executes worker-level service hooks with caching
+     * @param hookName - The name of the hook to execute
+     * @param args - Arguments to pass to the hook
+     * @returns Results from executing the hooks
+     */
     async execWorker(hookName: string, args?: unknown[]) {
         const cacheKey = `worker-${hookName}`;
         
@@ -74,10 +94,44 @@ export class Services {
         return [];
     }
 
+    /** Cleans up services and clears cache */
     async cleanup() {
         if (!this.isInitialized) return;
         this.isInitialized = false;
         this.ignoreServices = [];
         Services.hookCache.clear();
+    }
+
+    /** Reports current status of services for debugging */
+    async reportServiceStatus() {
+        console.log('=== WebDriverIO Services Status ===');
+        console.log('Initialized:', this.isInitialized);
+        console.log('Config services:', this.config.services);
+        console.log('Launcher services count:', this.launcherServices.length);
+        console.log('Worker services count:', this.workerServices.length);
+        console.log('Ignored services:', this.ignoreServices);
+        
+        if (this.launcherServices.length > 0) {
+            console.log('Launcher services details:');
+            this.launcherServices.forEach((service, index) => {
+                console.log(`  [${index}]:`, {
+                    constructor: service.constructor?.name,
+                    methods: Object.getOwnPropertyNames(Object.getPrototypeOf(service))
+                        .filter(name => typeof (service as any)[name] === 'function' && name !== 'constructor')
+                });
+            });
+        }
+        
+        if (this.workerServices.length > 0) {
+            console.log('Worker services details:');
+            this.workerServices.forEach((service, index) => {
+                console.log(`  [${index}]:`, {
+                    constructor: service.constructor?.name,
+                    methods: Object.getOwnPropertyNames(Object.getPrototypeOf(service))
+                        .filter(name => typeof (service as any)[name] === 'function' && name !== 'constructor')
+                });
+            });
+        }
+        console.log('================================');
     }
 }

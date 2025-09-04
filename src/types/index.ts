@@ -1,7 +1,7 @@
-import { Capabilities, Options, Services } from "@wdio/types";
-export { TestOptions } from './TestOptions';
-export { Context, TestArgs, HiddenTestArgs, WorkerArgs } from './TestArgs';
-export { Page } from './Page';
+import type { Capabilities, Options, Services } from "@wdio/types";
+export type { TestOptions } from './TestOptions';
+export type { Context, TestArgs, HiddenTestArgs, WorkerArgs } from './TestArgs';
+export type { Page } from './Page';
 
 /**
  * WebDriverIO configuration type without test runner specific options.

@@ -7,23 +7,22 @@
 
 import { test } from '../src/fixture';
 import { expect } from '@playwright/test';
-import { SimpleViewportLoggerService } from '../src/services/simple-viewport-logger';
+// import { SimpleViewportLoggerService } from '../src/services/simple-viewport-logger';
 
 test.use({
     capabilities: {
         browserName: 'chrome',
     },
-    services: [
-        [SimpleViewportLoggerService as any, {
-            enabled: true,
-            styles: {
-                wrapper: { backgroundColor: 'rgba(255,255,255,0.95)' },
-                text: { color: 'black', fontSize: '18px' },
-                closeButton: { color: 'red' },
-            },
-        }],
-    ]
-
+    // services: [
+    //     [SimpleViewportLoggerService as any, {
+    //         enabled: true,
+    //         styles: {
+    //             wrapper: { backgroundColor: 'rgba(255,255,255,0.95)' },
+    //             text: { color: 'black', fontSize: '18px' },
+    //             closeButton: { color: 'red' },
+    //         },
+    //     }],
+    // ]
 })
 
 test.describe('Services Integration', { tag: '@services' }, () => {
@@ -34,16 +33,16 @@ test.describe('Services Integration', { tag: '@services' }, () => {
             await driver.url('https://www.google.com');
 
             // El servicio SimpleViewportLoggerService agregó automáticamente los comandos
-            const browserWithLogger = driver as any;
+            // const browserWithLogger = driver as any;
 
             // Probar el viewport logger (ya no necesitamos verificar si existe)
             // await browserWithLogger.logToViewport('🚀 Navegando a Google...', {
-                // text: { color: 'blue', fontSize: '24px' }
+            //     text: { color: 'blue', fontSize: '24px' }
             // });
             await driver.pause(3000);
 
             // await browserWithLogger.logToViewport('✅ Página cargada correctamente', {
-                // text: { color: 'green', fontSize: '20px' }
+            //     text: { color: 'green', fontSize: '20px' }
             // });
             await driver.pause(3000);
 
@@ -51,7 +50,7 @@ test.describe('Services Integration', { tag: '@services' }, () => {
             console.log('Page title:', title);
 
             // await browserWithLogger.logToViewport(`📄 Título obtenido: ${title}`, {
-                // text: { color: 'purple', fontSize: '18px' }
+            //     text: { color: 'purple', fontSize: '18px' }
             // });
             await driver.pause(5000);
 
@@ -60,7 +59,7 @@ test.describe('Services Integration', { tag: '@services' }, () => {
             await driver.pause(2000);
 
             // await browserWithLogger.logToViewport('🧹 Test completado - Cerrando en 5 segundos', {
-                // text: { color: 'orange', fontSize: '16px' }
+            //     text: { color: 'orange', fontSize: '16px' }
             // });
 
             await driver.pause(5000);

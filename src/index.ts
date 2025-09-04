@@ -3,7 +3,8 @@ import { Context } from './types';
 export * from 'webdriverio';
 
 export { defineConfig, devices, expect } from '@playwright/test';
-export { TestInfo, test, driver } from './fixture';
+export { test, driver } from './fixture';
+export type { TestInfo } from './fixture';
 export type * from './types';
 
 declare global {
