@@ -1,6 +1,5 @@
 import { Context } from './types/TestArgs';
 
-export { defineConfig, devices, expect } from '@playwright/test';
 export * from './types';
 export * from './fixture';
 export * from 'webdriverio';

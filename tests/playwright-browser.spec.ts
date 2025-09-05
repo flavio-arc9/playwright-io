@@ -1,5 +1,5 @@
-import { Locator } from '@playwright/test';
-import { devices, test, expect } from '../src/index';
+import { devices, expect } from "@playwright/test";
+import { test } from "../src";
 
 test.use({ ...devices['Desktop Chrome'] });
 
@@ -12,7 +12,7 @@ const TODO_ITEMS = [
 test.describe('Playwright Browser',{tag: '@playwright'}, () => {
 
     test('Demo Test', async ({ page }) => {
-        const element: Locator = page.locator('//a[@href="/docs/intro"]');
+        const element = page.locator('//a[@href="/docs/intro"]');
         console.log('Element found:', element);
 
 

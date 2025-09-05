@@ -1,5 +1,6 @@
 
-import { test, expect, Key } from '../src';
+import { expect } from '@playwright/test';
+import { test, Key } from '../src';
 
 test.use({
     config: {

@@ -1,4 +1,5 @@
-import { test, expect } from '../src';
+import { expect } from '@playwright/test';
+import { test } from '../src';
 
 test.use({
     capabilities: {
