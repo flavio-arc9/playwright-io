@@ -1,4 +1,4 @@
-import { IOConfig, IOCapabilities, RecorderOptions, IOServices } from ".";
+import { IOConfig, IOCapabilities, RecorderOptions, IOServices } from "./index";
 import { PlaywrightTestOptions } from "@playwright/test";
 
 /**
@@ -13,7 +13,7 @@ export interface TestOptions extends PlaywrightTestOptions, IOCapabilities {
      */
     config: Partial<IOConfig>;
     
-    /** WebDriverIO services for automation tasks (logging, screenshots, reporting) */
+    /** WebDriverIO services for automation tasks */
     services: IOServices[];
     
     /** Screen recording during test execution - boolean or detailed RecorderOptions */

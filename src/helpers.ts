@@ -1,6 +1,6 @@
 
 import { test } from ".";
-import type { Capabilities } from "@wdio/types"
+import { Capabilities } from "@wdio/types"
 
 /**
  * Test annotation utilities for adding metadata to Playwright test reports.

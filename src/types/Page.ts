@@ -1,7 +1,7 @@
 
-import type { Page as OriginPage } from '@playwright/test';
-import type { Context, Locators } from '.';
-import type { ChainablePromiseArray, ChainablePromiseElement } from '..';
+import { Page as OriginPage } from '@playwright/test';
+import { Context, Locators } from './index';
+import { ChainablePromiseArray, ChainablePromiseElement } from '../index';
 
 /**
  * Extended Playwright Page interface that adds limited WebDriverIO element selection capabilities.

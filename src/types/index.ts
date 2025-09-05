@@ -1,7 +1,4 @@
-import type { Capabilities, Options, Services } from "@wdio/types";
-export type { TestOptions } from './TestOptions';
-export type { Context, TestArgs, HiddenTestArgs, WorkerArgs } from './TestArgs';
-export type { Page } from './Page';
+import { Capabilities, Options, Services } from "@wdio/types";
 
 /**
  * WebDriverIO configuration type without test runner specific options.
@@ -23,6 +20,9 @@ export type IOServices = Services.ServiceEntry
  */
 export type IORemote = IOConfig & IOCapabilities
 
+/**
+ * Full WebDriverIO configuration type including test runner specific options.
+ */
 export type WdioConfig = WebdriverIO.Config
 
 /**
@@ -63,3 +63,7 @@ export type RecorderOptions = {
     /** Maximum recording duration in seconds */
     maxDuration?: number;
 } 
+
+export * from './TestOptions';
+export * from './TestArgs';
+export * from './Page';

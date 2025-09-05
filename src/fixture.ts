@@ -1,5 +1,5 @@
 import { test as base, TestType } from '@playwright/test';
-import type { TestArgs, HiddenTestArgs, WorkerArgs, TestOptions, Context, WdioConfig } from '.';
+import { TestArgs, HiddenTestArgs, WorkerArgs, TestOptions, Context, WdioConfig } from '.';
 import { Pages } from './pages';
 import { Session } from './session';
 import { Services } from './services';

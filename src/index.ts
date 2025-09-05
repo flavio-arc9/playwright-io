@@ -1,11 +1,9 @@
-import { Context } from './types';
-
-export * from 'webdriverio';
+import { Context } from './types/TestArgs';
 
 export { defineConfig, devices, expect } from '@playwright/test';
-export { test, driver } from './fixture';
-export type { TestInfo } from './fixture';
-export type * from './types';
+export * from './types';
+export * from './fixture';
+export * from 'webdriverio';
 
 declare global {
     /**

@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { TestOptions } from "./src/types/TestOptions";
+import { TestOptions } from "./dist";
 
 export default defineConfig<TestOptions>({
     testDir: './tests',
@@ -20,10 +20,7 @@ export default defineConfig<TestOptions>({
         takeScreenshot: false,
         recordingScreen: false,
         config: {},
-        capabilities: {
-            platformName: 'Android',
-            "appium:deviceName": "Emulador 5554",
-        },
+        capabilities: {},
         services: []
     },
     projects: [

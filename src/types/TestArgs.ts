@@ -1,8 +1,9 @@
-import type { Page, TestOptions } from "."
-import type { Browser as ExtendBrowser } from "webdriverio";
-import type { PlaywrightTestArgs, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from "@playwright/test";
-import type { Session } from "../session";
-import type { Services } from "../services";
+import { Page } from "./Page"
+import { TestOptions } from "./TestOptions"
+import { Browser as ExtendBrowser } from "webdriverio";
+import { PlaywrightTestArgs, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from "@playwright/test";
+import { Session } from "../session";
+import { Services } from "../services";
 
 /**
  * Context represents WebDriverIO's Browser instance, 
