@@ -1,4 +1,4 @@
-import { IOConfig, IOCapabilities, RecorderOptions, IOServices } from "./index";
+import { IOConfig, IOCapabilities, RecorderOptions, IOServices } from ".";
 import { PlaywrightTestOptions } from "@playwright/test";
 
 /**

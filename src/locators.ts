@@ -1,4 +1,4 @@
-import { Browser, Locators as Locator } from "./index";
+import { Locators as Locator, Context } from "./types";
 
 /**
  * Platform-aware locator resolver for WebDriverIO.
@@ -6,14 +6,14 @@ import { Browser, Locators as Locator } from "./index";
  */
 class Locators {
     /**
-     * Resolves platform-specific locators based on the current WebDriverIO driver context.
+     * Resolves platform-specific locators based on the current WebDriverIO driver Context.
      * 
-     * @param driver - WebDriverIO browser instance
+     * @param driver - WebDriverIO Context instance
      * @param locator - String locator or Locator object with platform-specific options
      * @returns Resolved locator string for the current platform
      * @throws Error if no valid locator is found for the current platform
      */
-    public get(driver: Browser, locator: Locator): string {
+    public get(driver: Context, locator: Locator): string {
         if (typeof locator === 'string') {
             return locator;
         }
@@ -32,37 +32,37 @@ class Locators {
 
     /**
      * Determines if the driver is running on Android platform.
-     * @param driver - WebDriverIO browser instance
+     * @param driver - WebDriverIO Context instance
      * @returns True if the driver is running on Android, false otherwise
      */
-    private isAndroid(driver: Browser): boolean {
+    private isAndroid(driver: Context): boolean {
         return driver.isAndroid;
     }
 
     /**
      * Determines if the driver is running on iOS platform.
-     * @param driver - WebDriverIO browser instance
+     * @param driver - WebDriverIO Context instance
      * @returns True if the driver is running on iOS, false otherwise
      */
-    private isIOS(driver: Browser): boolean {
+    private isIOS(driver: Context): boolean {
         return driver.isIOS;
     }
 
     /**
      * Determines if the driver is running on a mobile platform.
-     * @param driver - WebDriverIO browser instance
+     * @param driver - WebDriverIO Context instance
      * @returns True if the driver is running on a mobile platform, false otherwise
      */
-    private isMobile(driver: Browser): boolean {
+    private isMobile(driver: Context): boolean {
         return driver.isMobile;
     }
 
     /**
-     * Determines if the driver is running in a web browser context.
-     * @param driver - WebDriverIO browser instance
-     * @returns True if the driver is running in a web browser context, false otherwise
+     * Determines if the driver is running in a web Context context.
+     * @param driver - WebDriverIO Context instance
+     * @returns True if the driver is running in a web Context context, false otherwise
      */
-    private isWebBrowser(driver: Browser): boolean {
+    private isWeb(driver: Context): boolean {
         return (
             driver.isChromium || 
             driver.isFirefox || 
@@ -73,11 +73,11 @@ class Locators {
 
     /**
      * Resolves the appropriate locator based on platform detection.
-     * @param driver - WebDriverIO browser instance
+     * @param driver - WebDriverIO Context instance
      * @param locator - Locator object containing platform-specific locators
      * @returns The resolved locator string or undefined if not found
      */
-    private resolvePlatformLocator(driver: Browser, locator: NonNullable<Exclude<Locator, string>>): string | undefined {
+    private resolvePlatformLocator(driver: Context, locator: NonNullable<Exclude<Locator, string>>): string | undefined {
         if (this.isAndroid(driver) && locator.android) {
             return locator.android;
         }
@@ -90,7 +90,7 @@ class Locators {
             return locator.mobile;
         }
         
-        if (this.isWebBrowser(driver) && locator.web) {
+        if (this.isWeb(driver) && locator.web) {
             return locator.web;
         }
         

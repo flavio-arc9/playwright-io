@@ -29,13 +29,15 @@
 		"README.md",
 		"LICENSE"
 	],
-	"main": "./dist/index.ts",
-	"type": "module",
+	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"scripts": {
 		"build": "npm run clean && tsc",
+		"build:test": "npm run build && npm run pack:test",
 		"clean": "rm -rf dist",
-		"test": "playwright test"
+		"test": "playwright test",
+		"pack:test": "npm pack --pack-destination ./",
+		"prepublishOnly": "npm run build"
 	},
 	"devDependencies": {
 		"@types/node": "^22.10.7",

@@ -1,33 +1,25 @@
 {
 	"compilerOptions": {
-		"module": "ESNext",							// Usar "ESNext" para módulos ES
-		"target": "es2022",							// Apuntar a ES2022 para características modernas de JavaScript		
-		"moduleResolution": "node",					// Resolución de módulos al estilo Node.js
-		"strict": true,								// Habilitar todas las verificaciones estrictas
-		"esModuleInterop": true,					// Habilitar interoperabilidad entre módulos ES y CommonJS
-		"allowSyntheticDefaultImports": true, 		// Permitir importaciones por defecto sintéticas
-		"skipLibCheck": true,						// Omitir verificación de tipos en archivos de declaración
-		"forceConsistentCasingInFileNames": true, 	// Forzar consistencia en el uso de mayúsculas y minúsculas en nombres de archivos
-		"outDir": "./dist",							// Directorio de salida para archivos compilados
-		"baseUrl": ".",								// Base URL para resolución de módulos
-		"rootDir": "./src",							// Habilitar soporte para archivos JavaScript
-		"allowJs": true, 							// Habilitar generación de archivos de declaración
-		"declaration": true, 						// Habilitar generación de mapas de declaración
-		"declarationMap": true,	        			// Habilitar soporte para archivos JavaScript
-		"resolveJsonModule": true,					// Habilitar soporte para archivos JSON
-		"removeComments": false,	    			// No eliminar comentarios en archivos de salida
-		"strictFunctionTypes": false,   			// Deshabilitar verificación estricta de tipos de funciones
-		"experimentalDecorators": true, 			// Habilitar soporte para decoradores experimentales
+		"outDir": "dist", 			// Carpeta donde se generarán los archivos compilados
+		"target": "ES2022", 		// Define el nivel de ECMAScript que deseas usar
+		"module": "CommonJS", 		// Volvemos a CommonJS para compatibilidad
+		"moduleResolution": "Node", // Resolución de módulos compatible con Node.js
+		"strict": true, 			// Activa comprobaciones estrictas de TypeScript
+		"esModuleInterop": true, 	// Facilita la interoperabilidad entre módulos CommonJS y ES
+		"skipLibCheck": true, 		// Omite la comprobación de tipos de las dependencias
+		"declaration": true, 		// Genera archivos de declaración (.d.ts)
+		"sourceMap": true, 			// Genera archivos de mapa de fuente para depuración
+		"resolveJsonModule": true, 	// Permite la importación de módulos JSON
 		"lib": [
-			"es2023",
-			"dom",
-			"es2021"
-		],
+			"ES2022",
+			"DOM"
+		], 							// Especifica las bibliotecas estándar de TypeScript
+		"experimentalDecorators": true, // Habilita el uso de decoradores experimentales
+		"emitDecoratorMetadata": true,  // Habilita la emisión de metadatos de decoradores
 		"types": [
-			"node",
 			"webdriverio",
 			"@wdio/types",
-			"playwright"
+			"playwright",
 		]
 	},
 	"include": ["src/**/*"], // Incluye todos los archivos JS y TS en la carpeta src

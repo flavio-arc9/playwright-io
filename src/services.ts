@@ -1,6 +1,17 @@
-import { initializeLauncherService, initializeWorkerService, executeHooksWithArgs } from '@wdio/utils';
 import { Services as Service } from "@wdio/types";
 import { WdioConfig } from './types';
+
+// Dynamic import for @wdio/utils to handle ES module compatibility
+let wdioUtils: any;
+
+async function getWdioUtils() {
+    if (!wdioUtils) {
+        // Use eval to force a true dynamic import at runtime
+        const importFn = new Function('specifier', 'return import(specifier)');
+        wdioUtils = await importFn('@wdio/utils');
+    }
+    return wdioUtils;
+}
 
 /**
  * Manages WebDriverIO services lifecycle and hook execution.
@@ -30,6 +41,7 @@ export class Services {
         if (this.isInitialized) { return }
 
         if (this.isServices()) {
+            const { initializeLauncherService } = await getWdioUtils();
             const { launcherServices, ignoredWorkerServices } = await initializeLauncherService(
                 this.config,
                 this.config.capabilities
@@ -58,6 +70,7 @@ export class Services {
 
         const hooks = Services.hookCache.get(cacheKey) || [];
         if (hooks.length > 0) {
+            const { executeHooksWithArgs } = await getWdioUtils();
             return await executeHooksWithArgs(hookName, hooks, args);
         }
         return [];
@@ -65,6 +78,7 @@ export class Services {
 
     /** Initializes worker-level services for test execution */
     async initWorker() {
+        const { initializeWorkerService } = await getWdioUtils();
         this.workerServices = await initializeWorkerService(
             this.config,
             this.config.capabilities[0] as any,
@@ -89,6 +103,7 @@ export class Services {
 
         const hooks = Services.hookCache.get(cacheKey) || [];
         if (hooks.length > 0) {
+            const { executeHooksWithArgs } = await getWdioUtils();
             return await executeHooksWithArgs(hookName, hooks, args);
         }
         return [];

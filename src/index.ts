@@ -2,7 +2,6 @@ import { Context } from './types/TestArgs';
 
 export * from './types';
 export * from './fixture';
-export * from 'webdriverio';
 
 declare global {
     /**

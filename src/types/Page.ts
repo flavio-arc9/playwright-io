@@ -1,7 +1,6 @@
 
 import { Page as OriginPage } from '@playwright/test';
-import { Context, Locators } from './index';
-import { ChainablePromiseArray, ChainablePromiseElement } from '../index';
+import { Context, Element, Elements, Locators } from '.';
 
 /**
  * Extended Playwright Page interface that adds limited WebDriverIO element selection capabilities.
@@ -22,7 +21,7 @@ export interface Page extends OriginPage {
      * The appropriate locator is chosen based on the current platform.
      *
      * @param selector  A string locator or `Locator` object with platform-specific locators
-     * @return ChainablePromiseElement WebDriverIO element object for the found element
+     * @return Element WebDriverIO element object for the found element
      * 
      * @example
      * ```ts
@@ -39,7 +38,7 @@ export interface Page extends OriginPage {
      * await menuButton.click();
      * ```
      */
-    locator$: (selector: Locators) => ChainablePromiseElement;
+    locator$: (selector: Locators) => Element;
 
     /**
      * The `locator$$` method finds multiple elements using platform-specific locators.
@@ -49,7 +48,7 @@ export interface Page extends OriginPage {
      * The appropriate locator is chosen based on the current platform.
      *
      * @param selector  A string selector or `Locator` object with platform-specific locators
-     * @return ChainablePromiseArray Array of WebDriverIO element objects for the found elements
+     * @return Elements Array of WebDriverIO element objects for the found elements
      * 
      * @example
      * ```ts
@@ -68,7 +67,7 @@ export interface Page extends OriginPage {
      * console.log(itemTexts);
      * ```
      */
-    locator$$: (selector: Locators) => ChainablePromiseArray;
+    locator$$: (selector: Locators) => Elements;
     
     /**
      * The `waitForElement` method waits for an element using platform-specific locators.
@@ -79,7 +78,7 @@ export interface Page extends OriginPage {
      * 
      * @param selector  A string selector or `Locator` object with platform-specific selectors
      * @param options  Configuration options for timeout, visibility, and enabled state
-     * @return ChainablePromiseElement  WebDriverIO element object for the found element
+     * @return Element  WebDriverIO element object for the found element
      * 
      * @example
      * ```ts
@@ -100,5 +99,5 @@ export interface Page extends OriginPage {
         timeout?: number;
         visible?: boolean;
         enabled?: boolean;
-    }) => ChainablePromiseArray;
+    }) => Elements;
 }

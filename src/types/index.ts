@@ -1,4 +1,15 @@
-import { Capabilities, Options, Services } from "@wdio/types";
+import type { Capabilities, Options, Services } from "@wdio/types";
+import type { ChainablePromiseArray, ChainablePromiseElement } from "webdriverio";
+
+/** 
+ * Represents ChainablePromiseElement 
+ */
+export type Element = ChainablePromiseElement;
+
+/** 
+ * Represents ChainablePromiseArray 
+ */
+export type Elements = ChainablePromiseArray;
 
 /**
  * WebDriverIO configuration type without test runner specific options.
