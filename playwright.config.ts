@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { TestOptions } from "./dist";
+import { TestOptions } from "./src";
 
 export default defineConfig<TestOptions>({
     testDir: './tests',
@@ -19,9 +19,11 @@ export default defineConfig<TestOptions>({
         video: 'off',
         takeScreenshot: false,
         recordingScreen: false,
-        config: {},
-        capabilities: {},
-        services: []
+        config: {
+            logLevel: 'info'
+        },
+        // capabilities: {},
+        // services: []
     },
     projects: [
         {
@@ -29,6 +31,9 @@ export default defineConfig<TestOptions>({
             use: {
                 ...devices['Desktop Chrome']
             }
+        },
+        {
+            name: 'appium',
         },
         {
             name: 'WebdriverIO Android 1',

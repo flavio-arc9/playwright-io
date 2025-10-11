@@ -1,6 +1,8 @@
 
 import { test } from ".";
 import { Capabilities } from "@wdio/types"
+import { glob } from 'glob';
+import { join, resolve } from 'path';
 
 /**
  * Test annotation utilities for adding metadata to Playwright test reports.
@@ -30,7 +32,7 @@ class Helper {
                 description: this.formatValue(value),
             });
         }
-    } 
+    }
 
     /**
      * Formats capability values for display in annotations.
@@ -44,7 +46,7 @@ class Helper {
                 return String(value);
             }
         }
-        
+
         return String(value);
     }
 
@@ -64,6 +66,26 @@ class Helper {
         }
 
         return false;
+    }
+
+    /**
+     * Obtiene todos los archivos de test desde el testDir
+     */
+    async getTestFiles(testDir: string) {
+        const patterns = [
+            '**/*.spec.ts',
+            '**/*.spec.js',
+            '**/*.test.ts',
+            '**/*.test.js'
+        ];
+
+        const files: string[] = [];
+        for (const pattern of patterns) {
+            const found = await glob(join(testDir, pattern));
+            files.push(...found);
+        }
+
+        return files.map(file => resolve(file));
     }
 }
 

@@ -23,11 +23,10 @@ export class Services {
     private launcherServices: Service.ServiceInstance[] = [];
     private ignoreServices: string[] = [];
     private isInitialized = false;
+    private config: WdioConfig = { capabilities: [{platformName: 'Unknown'}] };
 
     /** Cache for service hooks to improve performance */
     private static hookCache = new Map<string, Function[]>();
-
-    constructor(private config: WdioConfig) { }
 
     /** Checks if services are configured 
      * @returns boolean indicating if services are present
@@ -37,8 +36,10 @@ export class Services {
     }
 
     /** Initializes launcher-level services for worker preparation */
-    async initLauncher() {
+    async initLauncher(config: WdioConfig) {
         if (this.isInitialized) { return }
+
+        this.config = config;
 
         if (this.isServices()) {
             const { initializeLauncherService } = await getWdioUtils();
@@ -77,13 +78,19 @@ export class Services {
     }
 
     /** Initializes worker-level services for test execution */
-    async initWorker() {
+    async initWorker(config: WdioConfig) {
+        this.config = { ...this.config, ...config };
+
+        console.log('Initializing worker services with config:', this.config);
+
         const { initializeWorkerService } = await getWdioUtils();
+
         this.workerServices = await initializeWorkerService(
             this.config,
-            this.config.capabilities[0] as any,
+            this.config.capabilities[0] as WebdriverIO.Capabilities,
             this.ignoreServices
         );
+        this.config = config;
     }
 
     /** Executes worker-level service hooks with caching

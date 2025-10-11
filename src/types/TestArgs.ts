@@ -4,6 +4,7 @@ import { Browser as ExtendBrowser } from "webdriverio";
 import { PlaywrightTestArgs, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from "@playwright/test";
 import { Session } from "../session";
 import { Services } from "../services";
+import { Hooks } from "../hooks";
 
 /**
  * Context represents WebDriverIO's Browser instance, 
@@ -50,5 +51,5 @@ export interface HiddenTestArgs {
  * Worker arguments
  */
 export interface WorkerArgs extends PlaywrightWorkerArgs, PlaywrightWorkerOptions {
-    workerServices: Services;
+    worker: Hooks;
 }

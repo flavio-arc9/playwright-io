@@ -3,11 +3,15 @@ import { TestArgs, HiddenTestArgs, WorkerArgs, TestOptions, Context, WdioConfig 
 import { Pages } from './pages';
 import { Session } from './session';
 import { Services } from './services';
+import { Hooks } from './hooks';
+import { helpers } from './helpers';
 
 /**
  * Global WebDriverIO driver instance accessible throughout test execution.
  */
 export let driver: Context;
+
+const exitCode = 0;
 
 /**
  * Extended Playwright test framework with integrated WebDriverIO support.
@@ -20,10 +24,11 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
      * Handles preparation, worker start/end, and completion phases.
      * @returns The worker services instance.
      */
-    workerServices: [
+    worker: [
         async ({ }, use, testInfo) => {
             const options = testInfo.project.use as TestOptions
-            const cid = testInfo.workerIndex;
+            const cid = testInfo.parallelIndex + '-' + testInfo.workerIndex;
+            const specs = await helpers.getTestFiles(testInfo.project.testDir);
 
             const config: WdioConfig = {
                 ...options.config,
@@ -31,18 +36,18 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
                 services: options.services
             }
 
-            const services = new Services(config);
+            const services = new Services();
+            await services.initLauncher(config);
+            // await services.reportServiceStatus();
 
-            await services.initLauncher();
-            await services.reportServiceStatus();
+            const hooks = new Hooks(services);
+            await hooks.onPrepare(config, config.capabilities);
+            await hooks.onWorkerStart(cid, options.capabilities as WebdriverIO.Capabilities, specs, config, []);
 
-            await services.execLauncher('onPrepare', [config, [options.capabilities]]);
-            await services.execLauncher('onWorkerStart', [cid, options.capabilities, [], {}, []]);
+            await use(hooks);
 
-            await use(services);
-
-            await services.execLauncher('onWorkerEnd', [cid, 0, [], 0]);
-            await services.execLauncher('onComplete', [0, config, [options.capabilities], 0]);
+            await hooks.onWorkerEnd(cid, exitCode, specs);
+            await hooks.onComplete(exitCode, config, config.capabilities, {} as any);
             await services.cleanup();
         },
         { scope: 'worker', title: 'Launcher Services', auto: true }
@@ -56,7 +61,7 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
         async ({ _useDefaultArray }, use, testInfo) => {
             const merge = {
                 ...(testInfo.project.use as TestOptions).services,
-                ..._useDefaultArray,
+                services: _useDefaultArray,
             }
             await use(merge);
         },
@@ -133,54 +138,92 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
      * @returns driver The created WebDriverIO driver instance
      */
     driver: [
-        async ({ _useSession, workerServices, config, capabilities }, use, testInfo) => {
-            const cid = testInfo.workerIndex;
+        async ({ _useSession, worker, config, capabilities, services }, use, testInfo) => {
+            const cid = testInfo.parallelIndex + '-' + testInfo.workerIndex;
 
             if (!_useSession) {
                 await use(undefined as any)
                 return;
             }
 
-            await workerServices.initWorker();
+            const wdioConfig: WdioConfig = {
+                ...config,
+                capabilities: [capabilities],
+                ...services
+            }
 
-            await workerServices.execWorker('beforeSession', [config, capabilities, [], cid]);
+            await worker.beforeSession(wdioConfig, capabilities, [], cid);
 
             driver = await _useSession.createSession();
 
-            await workerServices.execWorker('before', [capabilities, [], driver]);
+            await worker.before(capabilities, [], driver);
+
             const suite = {
                 type: 'suite',
                 title: testInfo.title,
+                parent: testInfo.project.name,
+                fullTitle: testInfo.project.name + ' ' + testInfo.title,
+                pending: false,
                 file: testInfo.file,
-                error: testInfo.error,
+                error: testInfo.error?.message || '',
                 duration: testInfo.duration
             }
 
-            await workerServices.execWorker('beforeSuite', [suite]);
-            await workerServices.execWorker('beforeTest', [base, testInfo]);
-            await workerServices.execWorker('beforeHook', [base, testInfo, 'beforeTest']);
+            await worker.beforeSuite(suite);
+
+            const testFull = {
+                ...suite,
+                fullName: testInfo.title,
+                ctx: {}
+            }
+
+            await worker.beforeTest(testFull, driver);
+            await worker.beforeHook(testFull, driver, 'beforeTest');
 
             await use(driver);
 
-            const testResult = {
-                error: undefined,
-                result: undefined,
-                passed: true,
-                duration: testInfo.duration,
-                retries: 0,
-                exception: '',
-                status: ''
+            const suite2 = {
+                type: 'suite',
+                title: testInfo.title,
+                parent: testInfo.project.name,
+                fullTitle: testInfo.project.name + ' ' + testInfo.title,
+                pending: false,
+                file: testInfo.file,
+                error: testInfo.error?.message || '',
+                duration: testInfo.duration
             }
 
-            await workerServices.execWorker('afterHook', [base, testInfo, testResult, 'afterTest']);
-            await workerServices.execWorker('afterTest', [base, testInfo, testResult]);
-            await workerServices.execWorker('afterSuite', [suite]);
-            await workerServices.execWorker('after', [0, capabilities, []]);
-            
+            const testFull2 = {
+                ...suite2,
+                fullName: testInfo.title,
+                ctx: {}
+            }
+
+            const testResult = {
+                error: testInfo.error?.message || '',
+                result: testInfo.status === 'passed' ? testInfo : undefined,
+                passed: testInfo.status === 'passed',
+                duration: testInfo.duration,
+                retries: { attempts: 0, limit: 0 },
+                exception: testInfo.error
+                    ? typeof testInfo.error.cause === 'string'
+                        ? testInfo.error.cause
+                        : testInfo.error.cause
+                            ? JSON.stringify(testInfo.error.cause)
+                            : ''
+                    : '',
+                status: testInfo.status?.toString().toUpperCase() || 'UNKNOWN'
+            }
+
+            await worker.afterHook(testFull2, driver, testResult, 'afterTest');
+            await worker.afterTest(testFull2, driver, testResult);
+            await worker.afterSuite(suite2);
+
+            await worker.after(0, capabilities, []);
             if (driver) await _useSession.deleteSession();
             driver = undefined as any;
 
-            await workerServices.execWorker('afterSession', [config, capabilities, []]);
+            await worker.afterSession(config, capabilities as WebdriverIO.Capabilities, []);
         },
         { scope: 'test' }
     ],

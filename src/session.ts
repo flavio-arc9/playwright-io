@@ -11,7 +11,7 @@ import { command } from "./command";
  */
 export class Session {
 
-    private static readonly DEFAULT_APPIUM_HOST = 'http://127.0.0.1:4723';
+    private static readonly DEFAULT_APPIUM_PORT = 4723;
     private static readonly DEFAULT_MJPEG_PORT = 9110;
     private static readonly DEFAULT_SYS_PORT = 8210;
     private static readonly DEFAULT_LOG_LEVEL = 'silent';
@@ -39,6 +39,17 @@ export class Session {
             return undefined;
         }
         return new Session(config, testInfo);
+    }
+    
+    /**
+     * Determines if this is a BrowserStack session.
+     * @returns True if the session is on BrowserStack, false otherwise.
+     */
+    private isBrowserStack() {
+        const capabilities = this.config.capabilities;
+        return !!(capabilities &&
+            typeof capabilities === 'object' &&
+            'bstack:options' in capabilities);
     }
 
     /**
@@ -83,30 +94,13 @@ export class Session {
      * Configures session for mobile/Appium usage.
      */
     private configMobile() {
-        const defaultUrl = new URL(Session.DEFAULT_APPIUM_HOST);
         const workerId = test.info().workerIndex;
         const systemPort = Session.DEFAULT_SYS_PORT + workerId;
         const mjpegPort = Session.DEFAULT_MJPEG_PORT + workerId;
 
-        this.config = {
-            ...this.config,
-            protocol: this.config.protocol || defaultUrl.protocol.slice(0, -1),
-            hostname: this.config.hostname || defaultUrl.hostname,
-            port: this.config.port || parseInt(defaultUrl.port, 10)
-        };
-
-        if (this.isAndroid()) {
-            this.config.capabilities = {
-                ...this.config.capabilities,
-                'appium:systemPort': systemPort
-            };
-        }
-
-        if (this.isIOS()) {
-            this.config.capabilities = {
-                ...this.config.capabilities,
-                'appium:wdaLocalPort': systemPort
-            };
+        if (!this.isBrowserStack()) {
+            this.config.port = this.config.port || Session.DEFAULT_APPIUM_PORT;
+            return;
         }
 
         if (helpers.isTraceEnabled()) {
@@ -116,6 +110,21 @@ export class Session {
             };
         }
 
+        if (this.isAndroid()) {
+            this.config.capabilities = {
+                ...this.config.capabilities,
+                'appium:systemPort': systemPort
+            };
+            return;
+        }
+
+        if (this.isIOS()) {
+            this.config.capabilities = {
+                ...this.config.capabilities,
+                'appium:wdaLocalPort': systemPort
+            };
+            return;
+        }
     }
 
     /**
