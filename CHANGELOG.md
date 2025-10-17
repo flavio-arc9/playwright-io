@@ -5,6 +5,21 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 y este proyecto se adhiere al [Versionado Semántico](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3-beta.1] - 2025-10-17
+
+### 🔧 Mejorado
+- **Inicialización de Servicios**: Mejoras en la gestión e inicialización de servicios
+- **Gestión de Fixtures**: Optimizaciones en el sistema de fixtures de Playwright
+- **Compatibilidad**: Mejoras en la compatibilidad con diferentes tipos de configuraciones
+- **Estabilidad**: Correcciones menores para mejorar la estabilidad general
+
+### 🐛 Corregido
+- **Inicialización de Worker**: Corrección en la inicialización de componentes worker
+- **Gestión de Estado**: Mejor manejo del estado durante el ciclo de vida de tests
+- **Configuración**: Mejoras en el procesamiento de configuraciones complejas
+
+> **📝 Nota**: Algunas características experimentales pueden estar disponibles pero no están documentadas oficialmente. Consulta el README para más información.
+
 ## [1.0.2] - 2025-08-22
 
 ### 🔧 Mejorado

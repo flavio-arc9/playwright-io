@@ -58,6 +58,62 @@ Combina lo mejor de Playwright y WebDriverIO para automatización móvil:
 npm install playwright-io
 ```
 
+## 🏗️ Nuevas Características (v1.0.3-beta.1+)
+
+A partir de la versión 1.0.3-beta.1, **Playwright-IO** incluye soporte completo para servicios de WebDriverIO:
+
+### **🔗 Integración de Servicios WebDriverIO** ⚠️ **EXPERIMENTAL**
+- **Hooks Nativos**: Implementación completa de hooks de WebDriverIO (`onPrepare`, `onWorkerStart`, `beforeTest`, `afterTest`, etc.)
+- **Servicios Externos**: Soporte nativo para servicios como BrowserStack, Sauce Labs, Appium Services
+- **Lifecycle Management**: Gestión automática del ciclo de vida de servicios launcher y worker
+
+> **⚠️ Advertencias Importantes**: 
+> - Esta funcionalidad es **experimental** y está sujeta a cambios sin previo aviso
+> - Se recomienda configurar los servicios únicamente en el archivo `playwright.config.ts` y **NO directamente en los archivos de test**
+> - **NO está documentada oficialmente** en la documentación del proyecto, solo se menciona aquí en el README
+> - Usar bajo su propio riesgo en entornos de producción
+
+### **📋 Configuración de Servicios** (Solo en `playwright.config.ts`)
+```typescript
+// playwright.config.ts - ✅ CONFIGURACIÓN RECOMENDADA
+export default defineConfig<TestOptions>({
+  use: {
+    capabilities: {
+      platformName: 'Android',
+      'appium:deviceName': 'Android Emulator',
+      'appium:app': './app.apk'
+    },
+    // ⚠️ EXPERIMENTAL: Configurar servicios WebDriverIO SOLO aquí
+    services: [
+      ['browserstack', {
+        user: process.env.BROWSERSTACK_USER,
+        key: process.env.BROWSERSTACK_KEY,
+        // Configuración específica del servicio
+      }],
+      ['appium', {
+        args: {
+          address: 'localhost',
+          port: 4723
+        }
+      }]
+    ]
+  }
+});
+```
+
+```typescript
+// ❌ NO RECOMENDADO: Configurar servicios en archivos de test
+// test('mi test', async () => {
+//   // No configurar servicios aquí
+// });
+```
+
+### **🎯 Beneficios Clave**
+- **🚀 Servicios Listos**: Usa cualquier servicio de WebDriverIO directamente
+- **🔄 Hooks Automáticos**: Los hooks se ejecutan automáticamente en el contexto correcto
+- **📊 Compatibilidad**: Formateo automático de datos para servicios que esperan formato Mocha
+- **⚡ Performance**: Gestión optimizada de servicios launcher y worker
+
 ## Uso básico
 
 1. Configura tu `playwright.config.ts` con dispositivos móviles
