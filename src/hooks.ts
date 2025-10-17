@@ -7,6 +7,103 @@ export class Hooks {
     constructor(private services: Services) { }
 
     /**
+     * Formats test data to match Mocha framework expectations for BrowserStack service
+     * @param test - Original test object
+     * @returns Formatted test object with Mocha-specific properties
+     */
+    private formatTestForMocha(test: any): Frameworks.Test {
+        if (!test) return test;
+
+        // Extraer información del test de Playwright
+        const testInfo = test.info || test;
+        const testTitle = testInfo.title || test.title || test.name || test.displayName || 'Unknown Test';
+        const parentTitle = testInfo.parent?.title || test.parent?.title || test.parent?.name;
+        
+        // Crear fullName más robusto
+        let fullName = testTitle;
+        if (parentTitle && parentTitle !== testTitle) {
+            fullName = `${parentTitle} ${testTitle}`.trim();
+        }
+
+        // Create a Mocha-compatible test object
+        const mochaTest: Frameworks.Test = {
+            title: testTitle,
+            fullName: fullName,
+            description: test.description || testTitle,
+            parent: parentTitle ? {
+                title: parentTitle,
+                ...test.parent
+            } : undefined,
+            state: test.state || (test.pending ? 'pending' : 'unknown'),
+            pending: test.pending || false,
+            duration: test.duration || 0,
+            file: testInfo.file || test.file || test.location?.file || '',
+            body: test.body || test.fn?.toString() || '',
+            // Agregar más propiedades que BrowserStack puede necesitar
+            ctx: test.ctx || {},
+            ...test // Preserve original properties
+        };
+
+        return mochaTest;
+    }
+
+    /**
+     * Formats test result data to match Mocha framework expectations for BrowserStack service
+     * @param result - Original test result object
+     * @returns Formatted test result object with Mocha-specific properties
+     */
+    private formatTestResultForMocha(result: any): Frameworks.TestResult {
+        if (!result) return result;
+
+        // Create a Mocha-compatible test result object
+        const mochaResult: Frameworks.TestResult = {
+            passed: result.passed !== undefined ? result.passed : result.status === 'passed',
+            duration: result.duration || 0,
+            error: result.error || result.err || undefined,
+            result: result.result || result.value || undefined,
+            retries: result.retries || { attempts: 0, limit: 0 },
+            ...result // Preserve original properties
+        };
+
+        // Ensure error is properly formatted if it exists
+        if (mochaResult.error && typeof mochaResult.error === 'object') {
+            mochaResult.error = {
+                name: mochaResult.error.name || 'Error',
+                message: mochaResult.error.message || 'Unknown error',
+                stack: mochaResult.error.stack || '',
+                ...mochaResult.error
+            };
+        }
+
+        return mochaResult;
+    }
+
+    /**
+     * Formats suite data to match Mocha framework expectations for BrowserStack service
+     * @param suite - Original suite object
+     * @returns Formatted suite object with Mocha-specific properties
+     */
+    private formatSuiteForMocha(suite: any): Frameworks.Suite {
+        if (!suite) return suite;
+
+        // Create a Mocha-compatible suite object
+        const mochaSuite: Frameworks.Suite = {
+            title: suite.title || suite.name || suite.description || 'Unknown Suite',
+            fullName: suite.fullName || suite.fullTitle || suite.title || suite.name || '',
+            parent: suite.parent ? {
+                title: suite.parent.title || suite.parent.name || '',
+                ...suite.parent
+            } : undefined,
+            pending: suite.pending || false,
+            file: suite.file || suite.location?.file || '',
+            duration: suite.duration || 0,
+            ...suite // Preserve original properties
+        };
+
+        return mochaSuite;
+    }
+
+    /**
  * Gets executed once before all workers get launched.
  * @param config        wdio configuration object
  * @param capabilities  list of capabilities details
@@ -103,20 +200,45 @@ export class Hooks {
     }
 
     /**
- * Hook that gets executed before the suite starts.
- * @param suite suite details
- */
+     * Hook that gets executed before the suite starts.
+     * @param suite suite details
+     */
     async beforeSuite(suite: Frameworks.Suite) {
-        return await this.services.execWorker('beforeSuite', [suite]);
-    }
-
-    /**
+        // Format suite data for Mocha framework compatibility with BrowserStack service
+        const formattedSuite = this.formatSuiteForMocha(suite);
+        return await this.services.execWorker('beforeSuite', [formattedSuite]);
+    }    /**
      * Function to be executed before a test (in Mocha/Jasmine only)
      * @param {object} test    test object
      * @param {object} context scope object the test was executed with
      */
     async beforeTest(test: Frameworks.Test, context: any) {
-        return await this.services.execWorker('beforeTest', [test, context]);
+        // Obtener información adicional del contexto de Playwright
+        const testInfo = (globalThis as any).testInfo || (test as any).info;
+        
+        // Crear un objeto test más completo
+        const enrichedTest = {
+            ...test,
+            info: testInfo,
+            // Agregar información del archivo y suite
+            file: testInfo?.file || test.file,
+            title: testInfo?.title || test.title,
+            parent: {
+                title: testInfo?.parent?.title || context?.suite?.title || 'Default Suite',
+                ...(typeof test.parent === 'object' ? test.parent : {})
+            }
+        };
+        
+        // Format test data for Mocha framework compatibility with BrowserStack service
+        const formattedTest = this.formatTestForMocha(enrichedTest);
+        
+        console.log('Before Test - Formatted test data:', {
+            title: formattedTest.title,
+            fullName: formattedTest.fullName,
+            parent: formattedTest.parent
+        });
+        
+        return await this.services.execWorker('beforeTest', [formattedTest, context]);
     }
 
     /**
@@ -127,7 +249,9 @@ export class Hooks {
      * @param hookName  name of the hook
     */
     async beforeHook(test: any, context: any, hookName: string) {
-        return await this.services.execWorker('beforeHook', [test, context, hookName]);
+        // Format test data for Mocha framework compatibility with BrowserStack service
+        const formattedTest = this.formatTestForMocha(test);
+        return await this.services.execWorker('beforeHook', [formattedTest, context, hookName]);
     }
 
     /**
@@ -139,7 +263,10 @@ export class Hooks {
      * @param hookName  name of the hook
     */
     async afterHook(test: Frameworks.Test, context: any, result: Frameworks.TestResult, hookName: string) {
-        return await this.services.execWorker('afterHook', [test, context, result, hookName]);
+        // Format test data for Mocha framework compatibility with BrowserStack service
+        const formattedTest = this.formatTestForMocha(test);
+        const formattedResult = this.formatTestResultForMocha(result);
+        return await this.services.execWorker('afterHook', [formattedTest, context, formattedResult, hookName]);
     }
 
     /**
@@ -153,7 +280,10 @@ export class Hooks {
      * @param {object}  result.retries   information about spec related retries, e.g. `{ attempts: 0, limit: 0 }`
      */
     async afterTest(test: Frameworks.Test, context: any, result: Frameworks.TestResult) {
-        return await this.services.execWorker('afterTest', [test, context, result]);
+        // Format test data for Mocha framework compatibility with BrowserStack service
+        const formattedTest = this.formatTestForMocha(test);
+        const formattedResult = this.formatTestResultForMocha(result);
+        return await this.services.execWorker('afterTest', [formattedTest, context, formattedResult]);
     }
 
     /**
@@ -161,7 +291,9 @@ export class Hooks {
      * @param suite suite details
      */
     async afterSuite(suite: Frameworks.Suite) {
-        return await this.services.execWorker('afterSuite', [suite]);
+        // Format suite data for Mocha framework compatibility with BrowserStack service
+        const formattedSuite = this.formatSuiteForMocha(suite);
+        return await this.services.execWorker('afterSuite', [formattedSuite]);
     }
 
 

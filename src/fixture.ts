@@ -5,6 +5,7 @@ import { Session } from './session';
 import { Services } from './services';
 import { Hooks } from './hooks';
 import { helpers } from './helpers';
+import { Frameworks } from '@wdio/types';
 
 /**
  * Global WebDriverIO driver instance accessible throughout test execution.
@@ -158,62 +159,24 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
 
             await worker.before(capabilities, [], driver);
 
-            const suite = {
-                type: 'suite',
-                title: testInfo.title,
-                parent: testInfo.project.name,
-                fullTitle: testInfo.project.name + ' ' + testInfo.title,
-                pending: false,
-                file: testInfo.file,
-                error: testInfo.error?.message || '',
-                duration: testInfo.duration
-            }
+            // Configurar información del test para hooks
+            (globalThis as any).testInfo = testInfo;
+
+            // Create proper Mocha-compatible suite and test objects
+            const suite = MochaHelpers.createSuite(testInfo);
+            const testFull = MochaHelpers.createTest(testInfo);
 
             await worker.beforeSuite(suite);
-
-            const testFull = {
-                ...suite,
-                fullName: testInfo.title,
-                ctx: {}
-            }
 
             await worker.beforeTest(testFull, driver);
             await worker.beforeHook(testFull, driver, 'beforeTest');
 
             await use(driver);
 
-            const suite2 = {
-                type: 'suite',
-                title: testInfo.title,
-                parent: testInfo.project.name,
-                fullTitle: testInfo.project.name + ' ' + testInfo.title,
-                pending: false,
-                file: testInfo.file,
-                error: testInfo.error?.message || '',
-                duration: testInfo.duration
-            }
-
-            const testFull2 = {
-                ...suite2,
-                fullName: testInfo.title,
-                ctx: {}
-            }
-
-            const testResult = {
-                error: testInfo.error?.message || '',
-                result: testInfo.status === 'passed' ? testInfo : undefined,
-                passed: testInfo.status === 'passed',
-                duration: testInfo.duration,
-                retries: { attempts: 0, limit: 0 },
-                exception: testInfo.error
-                    ? typeof testInfo.error.cause === 'string'
-                        ? testInfo.error.cause
-                        : testInfo.error.cause
-                            ? JSON.stringify(testInfo.error.cause)
-                            : ''
-                    : '',
-                status: testInfo.status?.toString().toUpperCase() || 'UNKNOWN'
-            }
+            // Create proper Mocha-compatible objects for cleanup
+            const suite2 = MochaHelpers.createSuite(testInfo);
+            const testFull2 = MochaHelpers.createTest(testInfo);
+            const testResult = MochaHelpers.createTestResult(testInfo);
 
             await worker.afterHook(testFull2, driver, testResult, 'afterTest');
             await worker.afterTest(testFull2, driver, testResult);
@@ -285,3 +248,89 @@ export const test = _test as TestType<TestArgs, WorkerArgs>;
  * Type definition for the extended test fixture.
  */
 export type TestInfo = typeof test;
+
+/**
+ * Helper functions to create properly formatted Mocha objects for BrowserStack service
+ */
+export const MochaHelpers = {
+    /**
+     * Creates a Mocha-compatible Suite object from Playwright TestInfo
+     * @param testInfo - Playwright test info
+     * @returns Properly formatted Frameworks.Suite object
+     */
+    createSuite(testInfo: any): Frameworks.Suite {
+        const suiteTitle = testInfo.parent?.title || 
+                          testInfo.project?.name || 
+                          testInfo.file?.split('/').pop()?.replace('.spec.ts', '') || 
+                          'Default Suite';
+                          
+        return {
+            type: 'suite',
+            title: suiteTitle,
+            parent: testInfo.parent?.title || '',
+            fullTitle: suiteTitle,
+            pending: false,
+            file: testInfo.file || '',
+            error: testInfo.error,
+            duration: testInfo.duration || 0
+        };
+    },
+
+    /**
+     * Creates a Mocha-compatible Test object from Playwright TestInfo
+     * @param testInfo - Playwright test info
+     * @returns Properly formatted Frameworks.Test object
+     */
+    createTest(testInfo: any): Frameworks.Test {
+        const suite = MochaHelpers.createSuite(testInfo);
+        const testTitle = testInfo.title || 'Untitled Test';
+        
+        // BrowserStack expects different formats for different frameworks
+        // For Mocha: fullTitle = "suite - test" (used in session names)  
+        // For Jasmine: fullName = "suite spec description" (parsed to extract suite name)
+        const fullTitle = `${suite.title} - ${testTitle}`;
+        const fullName = `${suite.title} ${testTitle} ${testTitle}`;  // Jasmine format: suite + space + spec + space + description
+        
+        return {
+            type: 'test',
+            title: testTitle,
+            parent: suite.title,
+            fullTitle: fullTitle,
+            fullName: fullName,
+            pending: false,
+            file: testInfo.file || '',
+            error: testInfo.error,
+            duration: testInfo.duration || 0,
+            ctx: testInfo,
+            description: testTitle,
+            fn: undefined,
+            body: '',
+            async: 0,
+            sync: true,
+            timedOut: false,
+            _retriedTest: undefined,
+            _currentRetry: testInfo.retry || 0,
+            _retries: testInfo.project?.retries || 0
+        };
+    },
+
+    /**
+     * Creates a Mocha-compatible TestResult object from Playwright TestInfo
+     * @param testInfo - Playwright test info
+     * @returns Properly formatted Frameworks.TestResult object
+     */
+    createTestResult(testInfo: any): Frameworks.TestResult {
+        return {
+            error: testInfo.error || undefined,
+            result: testInfo.status === 'passed' ? testInfo : undefined,
+            passed: testInfo.status === 'passed',
+            duration: testInfo.duration || 0,
+            retries: { 
+                attempts: testInfo.retry || 0, 
+                limit: testInfo.project?.retries || 0 
+            },
+            exception: testInfo.error?.message || '',
+            status: testInfo.status?.toString().toUpperCase() || 'UNKNOWN'
+        };
+    }
+};

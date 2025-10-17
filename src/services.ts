@@ -111,6 +111,7 @@ export class Services {
         const hooks = Services.hookCache.get(cacheKey) || [];
         if (hooks.length > 0) {
             const { executeHooksWithArgs } = await getWdioUtils();
+            
             return await executeHooksWithArgs(hookName, hooks, args);
         }
         return [];
