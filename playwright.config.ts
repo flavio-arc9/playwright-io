@@ -49,7 +49,7 @@ export default defineConfig<TestOptions>({
                         deviceName: 'Samsung Galaxy S22',
                         osVersion: '12.0',
                         projectName: 'Oficial',
-                        buildName: 'build-1',
+                        buildName: 'build-2',
                         video: false
                         // buildIdentifier: 'Identifier-1.1'
                     }

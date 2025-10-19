@@ -61,7 +61,7 @@ export class Instance {
             ...this._config,
             ...testConfig,
             capabilities: [testCapabilities],
-            // services: testServices
+            services: testServices
         }
 
         await this.services.initTest(this._config);

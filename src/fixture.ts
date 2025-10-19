@@ -1,5 +1,5 @@
 import { test as base, TestType } from '@playwright/test';
-import { TestArgs, HiddenTestArgs, WorkerArgs, TestOptions, Context, WdioConfig } from '.';
+import { TestArgs, HiddenTestArgs, WorkerArgs, TestOptions, Context, WdioConfig, IOServices } from '.';
 import { Pages } from './pages';
 import { Session } from './session';
 import { Instance } from './instance';
@@ -37,11 +37,9 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
      */
     services: [
         async ({ _useDefaultArray }, use, testInfo) => {
-            const merge = {
-                ...(testInfo.project.use as TestOptions).services,
-                services: _useDefaultArray,
-            }
-            await use(merge);
+            const projectServices = (testInfo.project.use as TestOptions).services || [];
+            const mergedServices = [...projectServices, ..._useDefaultArray];
+            await use(mergedServices);
         },
         { scope: 'test' }
     ],
@@ -161,7 +159,7 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
                 baseUrl: baseURL || config.baseUrl,
                 services: services
             };
-
+            console.log(testInfo.project.use)
             const session = Session.isValid(options, project);
             if (!session) {
                 await use(undefined);

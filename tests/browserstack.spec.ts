@@ -1,6 +1,17 @@
 import { expect } from '@playwright/test';
 import { test } from '../src';
 
+test.use({
+    services: [['appium', {}]],
+    capabilities: {
+        platformName: 'Android',
+        "appium:automationName": "UiAutomator2",
+    },
+    config: {
+        logLevel: 'silent'
+    }
+})
+
 test.describe('TestReporting is False', { tag: '@login' }, () => {
 
     test.beforeEach(async ({ page }) => {

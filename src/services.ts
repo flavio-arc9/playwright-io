@@ -80,6 +80,10 @@ export class Services {
     /** Initializes worker-level services for test execution */
     async initTest(config: WdioConfig) {
         this.config = { ...this.config, ...config };
+        
+        // Normalize services to array format for WebDriverIO compatibility
+        this.config.services = this.normalizeServicesConfig(this.config.services);
+        
         const { initializeWorkerService } = await getWdioUtils();
 
         this.workerServices = await initializeWorkerService(
@@ -153,5 +157,30 @@ export class Services {
             });
         }
         console.log('================================');
+    }
+
+    /**
+     * Normalizes services configuration to array format for WebDriverIO compatibility
+     * @param services - Services in object or array format
+     * @returns Services in array format
+     */
+    private normalizeServicesConfig(services: any): any[] {
+        if (Array.isArray(services)) {
+            return services;
+        }
+
+        if (typeof services === 'object' && services !== null) {
+            // Convert object format to array format
+            // If it's an object with service names as keys and configs as values
+            const entries = Object.entries(services);
+            if (entries.length > 0) {
+                return entries.map(([serviceName, config]) => {
+                    // Return format: [serviceName, config] or just serviceName if no config
+                    return config && typeof config === 'object' ? [serviceName, config] : serviceName;
+                });
+            }
+        }
+
+        return [];
     }
 }
