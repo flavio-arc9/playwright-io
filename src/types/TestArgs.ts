@@ -44,6 +44,7 @@ export interface HiddenTestArgs {
     _useDefaultBoolean: boolean;
     _useDefaultArray: Array<any>;
     _useSession?: Session;
+    _useDriver: Context;
 }
 
 /**

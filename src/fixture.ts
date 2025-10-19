@@ -114,19 +114,9 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
      * @returns driver The created WebDriverIO driver instance
      */
     driver: [
-        async ({ _useSession, worker, config, capabilities, services }, use, testInfo) => {
-            if (!_useSession) {
-                await use(undefined as any)
-                return;
-            }
-
-            await worker.testStart(config, capabilities, services);
-            driver = await _useSession.createSession();
-            await worker.testMiddle(testInfo, driver);
-            await use(driver);
-            await worker.testEnd(testInfo);
-        },
-        { scope: 'test' }
+        async ({ _useDriver }, use) => {
+            await use(_useDriver)
+        }, { scope: 'test' }
     ],
     /**
      * Enhanced page object with WebDriverIO integration.
@@ -168,6 +158,21 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
             await use(session);
         },
         { scope: 'test' }
+    ],
+    _useDriver: [
+        async ({ _useSession, worker, config, capabilities, services }, use, testInfo) => {
+            if (!_useSession) {
+                await use(undefined as any)
+                return;
+            }
+
+            await worker.testStart(config, capabilities, services);
+            driver = await _useSession.createSession();
+            await worker.testMiddle(testInfo, driver);
+            await use(driver);
+            await worker.testEnd(testInfo);
+        },
+        { scope: 'test', title: 'Services & Hooks' }
     ],
     // Internal fixture for providing default array values in test overrides
     _useDefaultArray: [[], { option: true }],
