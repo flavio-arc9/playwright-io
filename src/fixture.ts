@@ -2,22 +2,18 @@ import { test as base, TestType } from '@playwright/test';
 import { TestArgs, HiddenTestArgs, WorkerArgs, TestOptions, Context, WdioConfig } from '.';
 import { Pages } from './pages';
 import { Session } from './session';
-import { Services } from './services';
-import { Hooks } from './hooks';
-import { helpers } from './helpers';
-import { Frameworks } from '@wdio/types';
+import { Instance } from './instance';
+
 
 /**
  * Global WebDriverIO driver instance accessible throughout test execution.
  */
 export let driver: Context;
 
-const exitCode = 0;
-
 /**
  * Extended Playwright test framework with integrated WebDriverIO support.
  * Provides fixtures for configuration, capabilities, driver management, 
- * page objects, services, and session lifecycle management.
+ * page objects, services, hooks and session lifecycle management.
  */
 const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
     /**
@@ -26,30 +22,11 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
      * @returns The worker services instance.
      */
     worker: [
-        async ({ }, use, testInfo) => {
-            const options = testInfo.project.use as TestOptions
-            const cid = testInfo.parallelIndex + '-' + testInfo.workerIndex;
-            const specs = await helpers.getTestFiles(testInfo.project.testDir);
-
-            const config: WdioConfig = {
-                ...options.config,
-                capabilities: [options.capabilities],
-                services: options.services
-            }
-
-            const services = new Services();
-            await services.initLauncher(config);
-            // await services.reportServiceStatus();
-
-            const hooks = new Hooks(services);
-            await hooks.onPrepare(config, config.capabilities);
-            await hooks.onWorkerStart(cid, options.capabilities as WebdriverIO.Capabilities, specs, config, []);
-
-            await use(hooks);
-
-            await hooks.onWorkerEnd(cid, exitCode, specs);
-            await hooks.onComplete(exitCode, config, config.capabilities, {} as any);
-            await services.cleanup();
+        async ({ }, use, workerInfo) => {
+            const instance = new Instance(workerInfo);
+            await instance.workerStart();
+            await use(instance);
+            await instance.workerEnd();
         },
         { scope: 'worker', title: 'Launcher Services', auto: true }
     ],
@@ -140,53 +117,16 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
      */
     driver: [
         async ({ _useSession, worker, config, capabilities, services }, use, testInfo) => {
-            const cid = testInfo.parallelIndex + '-' + testInfo.workerIndex;
-
             if (!_useSession) {
                 await use(undefined as any)
                 return;
             }
 
-            const wdioConfig: WdioConfig = {
-                ...config,
-                capabilities: [capabilities],
-                ...services
-            }
-
-            await worker.beforeSession(wdioConfig, capabilities, [], cid);
-
+            await worker.testStart(config, capabilities, services);
             driver = await _useSession.createSession();
-
-            await worker.before(capabilities, [], driver);
-
-            // Configurar información del test para hooks
-            (globalThis as any).testInfo = testInfo;
-
-            // Create proper Mocha-compatible suite and test objects
-            const suite = MochaHelpers.createSuite(testInfo);
-            const testFull = MochaHelpers.createTest(testInfo);
-
-            await worker.beforeSuite(suite);
-
-            await worker.beforeTest(testFull, driver);
-            await worker.beforeHook(testFull, driver, 'beforeTest');
-
+            await worker.testMiddle(testInfo, driver);
             await use(driver);
-
-            // Create proper Mocha-compatible objects for cleanup
-            const suite2 = MochaHelpers.createSuite(testInfo);
-            const testFull2 = MochaHelpers.createTest(testInfo);
-            const testResult = MochaHelpers.createTestResult(testInfo);
-
-            await worker.afterHook(testFull2, driver, testResult, 'afterTest');
-            await worker.afterTest(testFull2, driver, testResult);
-            await worker.afterSuite(suite2);
-
-            await worker.after(0, capabilities, []);
-            if (driver) await _useSession.deleteSession();
-            driver = undefined as any;
-
-            await worker.afterSession(config, capabilities as WebdriverIO.Capabilities, []);
+            await worker.testEnd(testInfo);
         },
         { scope: 'test' }
     ],
@@ -248,89 +188,3 @@ export const test = _test as TestType<TestArgs, WorkerArgs>;
  * Type definition for the extended test fixture.
  */
 export type TestInfo = typeof test;
-
-/**
- * Helper functions to create properly formatted Mocha objects for BrowserStack service
- */
-export const MochaHelpers = {
-    /**
-     * Creates a Mocha-compatible Suite object from Playwright TestInfo
-     * @param testInfo - Playwright test info
-     * @returns Properly formatted Frameworks.Suite object
-     */
-    createSuite(testInfo: any): Frameworks.Suite {
-        const suiteTitle = testInfo.parent?.title || 
-                          testInfo.project?.name || 
-                          testInfo.file?.split('/').pop()?.replace('.spec.ts', '') || 
-                          'Default Suite';
-                          
-        return {
-            type: 'suite',
-            title: suiteTitle,
-            parent: testInfo.parent?.title || '',
-            fullTitle: suiteTitle,
-            pending: false,
-            file: testInfo.file || '',
-            error: testInfo.error,
-            duration: testInfo.duration || 0
-        };
-    },
-
-    /**
-     * Creates a Mocha-compatible Test object from Playwright TestInfo
-     * @param testInfo - Playwright test info
-     * @returns Properly formatted Frameworks.Test object
-     */
-    createTest(testInfo: any): Frameworks.Test {
-        const suite = MochaHelpers.createSuite(testInfo);
-        const testTitle = testInfo.title || 'Untitled Test';
-        
-        // BrowserStack expects different formats for different frameworks
-        // For Mocha: fullTitle = "suite - test" (used in session names)  
-        // For Jasmine: fullName = "suite spec description" (parsed to extract suite name)
-        const fullTitle = `${suite.title} - ${testTitle}`;
-        const fullName = `${suite.title} ${testTitle} ${testTitle}`;  // Jasmine format: suite + space + spec + space + description
-        
-        return {
-            type: 'test',
-            title: testTitle,
-            parent: suite.title,
-            fullTitle: fullTitle,
-            fullName: fullName,
-            pending: false,
-            file: testInfo.file || '',
-            error: testInfo.error,
-            duration: testInfo.duration || 0,
-            ctx: testInfo,
-            description: testTitle,
-            fn: undefined,
-            body: '',
-            async: 0,
-            sync: true,
-            timedOut: false,
-            _retriedTest: undefined,
-            _currentRetry: testInfo.retry || 0,
-            _retries: testInfo.project?.retries || 0
-        };
-    },
-
-    /**
-     * Creates a Mocha-compatible TestResult object from Playwright TestInfo
-     * @param testInfo - Playwright test info
-     * @returns Properly formatted Frameworks.TestResult object
-     */
-    createTestResult(testInfo: any): Frameworks.TestResult {
-        return {
-            error: testInfo.error || undefined,
-            result: testInfo.status === 'passed' ? testInfo : undefined,
-            passed: testInfo.status === 'passed',
-            duration: testInfo.duration || 0,
-            retries: { 
-                attempts: testInfo.retry || 0, 
-                limit: testInfo.project?.retries || 0 
-            },
-            exception: testInfo.error?.message || '',
-            status: testInfo.status?.toString().toUpperCase() || 'UNKNOWN'
-        };
-    }
-};

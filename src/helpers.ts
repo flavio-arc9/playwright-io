@@ -1,8 +1,8 @@
-
 import { test } from ".";
-import { Capabilities } from "@wdio/types"
+import type { TestInfo } from "@playwright/test";
 import { glob } from 'glob';
 import { join, resolve } from 'path';
+import { Capabilities, Frameworks } from "@wdio/types"
 
 /**
  * Test annotation utilities for adding metadata to Playwright test reports.
@@ -86,6 +86,91 @@ class Helper {
         }
 
         return files.map(file => resolve(file));
+    }
+
+    /**
+     * Creates a Mocha-compatible Suite object from Playwright TestInfo
+     * @param testInfo - Playwright test info
+     * @returns Properly formatted Frameworks.Suite object
+     */
+    public getSuite(testInfo: TestInfo): Frameworks.Suite {
+        const suiteTitle = testInfo.titlePath?.length > 1 ? testInfo.titlePath[1] :
+            testInfo.project?.name || testInfo.file?.split('/').pop()?.replace('.spec.ts', '') ||
+            'Default Suite';
+        
+        const response = {
+            type: 'suite',
+            title: suiteTitle,
+            parent: testInfo.titlePath?.[0] || '',
+            fullTitle: suiteTitle,
+            pending: false,
+            file: testInfo.file || '',
+            error: testInfo.error,
+            duration: testInfo.duration || 0
+        };
+        return response;
+    }
+
+    /**
+     * Creates a Mocha-compatible Test object from Playwright TestInfo
+     * @param testInfo - Playwright test info
+     * @returns Properly formatted Frameworks.Test object
+     */
+    public getTest(testInfo: TestInfo): Frameworks.Test {
+        const suite = this.getSuite(testInfo);
+        const testTitle = testInfo.title || 'Untitled Test';
+
+        // For Mocha: fullTitle = "suite - test" (used in session names)  
+        // For Jasmine: fullName = "suite spec description" (parsed to extract suite name)
+        const fullTitle = `${suite.title} - ${testTitle}`;
+        const fullName = `${suite.title} ${testTitle} ${testTitle}`
+
+        const response =  {
+            type: 'test',
+            title: testTitle,
+            parent: suite.title,
+            fullTitle: fullTitle,
+            fullName: fullName,
+            pending: false,
+            file: testInfo.file || '',
+            error: testInfo.error,
+            duration: testInfo.duration || 0,
+            ctx: {},
+            description: testTitle,
+            fn: undefined,
+            body: '',
+            async: 0,
+            sync: true,
+            timedOut: false,
+            _retriedTest: undefined,
+            _currentRetry: testInfo.retry || 0,
+            _retries: testInfo.project?.retries || 0
+        };
+        return response;
+    }
+
+    /**
+     * Creates a Mocha-compatible TestResult object from Playwright TestInfo
+     * @param testInfo - Playwright test info
+     * @returns Properly formatted Frameworks.TestResult object
+     */
+    getResult(testInfo: TestInfo): Frameworks.TestResult {
+        return {
+            error: testInfo.error || undefined,
+            result: {
+                finished: testInfo.status === 'passed' ? 1 : 0,
+                passed: testInfo.status === 'passed' ? 1 : 0,
+                failed: testInfo.status === 'failed' ? 1 : 0,
+            },
+            passed: testInfo.status === 'passed',
+            duration: testInfo.duration || 0,
+            retries: {
+                attempts: testInfo.retry || 0,
+                limit: testInfo.project?.retries || 0
+            },
+            exception: testInfo.error?.message || '',
+            status: testInfo.status?.toString().toUpperCase() || 'UNKNOWN'
+        };
     }
 }
 

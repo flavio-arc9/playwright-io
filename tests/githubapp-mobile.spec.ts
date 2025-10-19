@@ -1,14 +1,14 @@
 import { expect } from '@playwright/test';
 import { test } from '../src';
 
-test.use({
-    capabilities: {
-        platformName: 'Android',
-        "appium:automationName": "UiAutomator2",
-        "appium:appPackage": "com.example.appetize",
-        "appium:appActivity": ".MainActivity"
-    }
-});
+// test.use({
+//     capabilities: {
+//         platformName: 'Android',
+//         "appium:automationName": "UiAutomator2",
+//         "appium:appPackage": "com.example.appetize",
+//         "appium:appActivity": ".MainActivity"
+//     }
+// });
 
 test('Github Android', { tag: '@temples1' }, async ({ page, driver }) => {
 
