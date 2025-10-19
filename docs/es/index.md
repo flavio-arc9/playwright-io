@@ -42,3 +42,4 @@ Playwright-IO extiende Playwright con capacidades móviles, ofreciendo:
 - 🎯 **Selectores Cross-Platform**: Estrategias adaptativas por plataforma
 - 📸 **Grabación Avanzada**: Screenshots y videos nativos
 - 🛠 **TypeScript-First**: Seguridad de tipos completa y soporte de IDE  
+- Servicios WDIO: Integración nativa con servicios del ecosistema WebDriverIO

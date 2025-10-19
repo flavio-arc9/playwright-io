@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"outDir": "dist", 			// Carpeta donde se generarán los archivos compilados
 		"target": "ES2022", 		// Define el nivel de ECMAScript que deseas usar
-		"module": "CommonJS", 		// Usa CommonJS para compatibilidad con Node.js
+		"module": "CommonJS", 		// Volvemos a CommonJS para compatibilidad
 		"moduleResolution": "Node", // Resolución de módulos compatible con Node.js
 		"strict": true, 			// Activa comprobaciones estrictas de TypeScript
 		"esModuleInterop": true, 	// Facilita la interoperabilidad entre módulos CommonJS y ES
@@ -22,13 +22,14 @@
 			"playwright",
 		]
 	},
-	"include": [
-		"src/**/*"
-	], 								// Incluye todos los archivos en la carpeta src
+	"include": ["src/**/*"], // Incluye todos los archivos JS y TS en la carpeta src
 	"exclude": [
 		"node_modules",
 		"**/node_modules/*",
+		"build",
 		"dist",
-		"/*.js"
+		"docs",
+		"examples",
+		"tests"
 	]
 }

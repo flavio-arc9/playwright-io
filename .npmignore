@@ -1,8 +1,10 @@
-tsconfig.json
-playwright.config.ts
-package.json
-package-lock.json
 build
 docs
+examples
+node_modules
 src
 tests
+package.json
+package-lock.json
+playwright.config.ts
+tsconfig.json

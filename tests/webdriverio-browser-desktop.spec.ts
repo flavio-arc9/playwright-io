@@ -1,4 +1,5 @@
-import { test, expect } from '../src';
+import { expect } from '@playwright/test';
+import { test } from '../src';
 
 test.use({
     capabilities: {
@@ -22,7 +23,7 @@ test.describe('WebdriverIO Browser Desktop', { tag: '@webdriverio-web-desktop' }
     test('Demo Test', async ({ page, driver }) => {
         await page.locator$('//a[@href="/docs/intro"]').click();
         await driver.pause(2000);
-
+        
         const name = await page.locator$('.navbar__title').getText();
         // You must provide the required parameters, e.g., { requestId: 'your-request-id' }
 

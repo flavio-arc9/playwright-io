@@ -1,15 +1,18 @@
 
-import { test, expect } from '../src';
+import { expect } from '@playwright/test';
+import { test } from '../src';
 
 test.use({
-    // headless: false,
     config: {
         baseUrl: 'https://playwright.dev/',
     },
     capabilities: {
         platformName: 'Android',
         "appium:browserName": "Chrome",
-        "appium:automationName": "UiAutomator2"
+        "appium:automationName": "UiAutomator2",
+        // "appium:appPackage": "com.android.chrome",
+        // "appium:appActivity": "com.google.android.apps.chrome.Main",
+        "appium:deviceName": "Emulador 5554",
     }
 });
 
@@ -17,7 +20,7 @@ test.beforeEach(async ({ page, driver }) => {
     await driver.url('/')
 }); 
 
-test.describe('WebdriverIO Browser Mobile', { tag: '@webdriverio-web-mobile' }, () => {
+test.describe('WebdriverIO Browser Mobile', { tag: '@webdriverio-web-mobile1' }, () => {
 
     test('Demo Test', async ({ page, driver }) => {
         await page.locator$('button[aria-label="Toggle navigation bar"]').click();

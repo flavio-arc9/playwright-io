@@ -1,46 +1,77 @@
 import { test as base, TestType } from '@playwright/test';
-import { TestArgs, HiddenTestArgs, WorkerArgs, TestOptions, Context } from './types';
-import { Pages, Session } from '.';
+import { TestArgs, HiddenTestArgs, WorkerArgs, TestOptions, Context, WdioConfig, IOServices } from '.';
+import { Pages } from './pages';
+import { Session } from './session';
+import { Instance } from './instance';
+
 
 /**
- * Global WebDriverIO driver instance available throughout the test execution.
+ * Global WebDriverIO driver instance accessible throughout test execution.
  */
 export let driver: Context;
 
 /**
- * Extended Playwright test with WebDriverIO integration.
- * Provides fixtures for config, capabilities, driver, page, and session management.
+ * Extended Playwright test framework with integrated WebDriverIO support.
+ * Provides fixtures for configuration, capabilities, driver management, 
+ * page objects, services, hooks and session lifecycle management.
  */
 const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
     /**
-     * Merges the provided configuration with the project-specific configuration.
+     * Worker-scoped services that manage service lifecycle across test workers.
+     * Handles preparation, worker start/end, and completion phases.
+     * @returns The worker services instance.
+     */
+    worker: [
+        async ({ }, use, workerInfo) => {
+            const instance = new Instance(workerInfo);
+            await instance.workerStart();
+            await use(instance);
+            await instance.workerEnd();
+        },
+        { scope: 'worker', title: 'Launcher Services', auto: true }
+    ],
+    /**
+     * Merges project and test-specific service configurations.
+     * This allows for dynamic configuration based on the test environment.
+     * @returns The merged services array.
+     */
+    services: [
+        async ({ _useDefaultArray }, use, testInfo) => {
+            const projectServices = (testInfo.project.use as TestOptions).services || [];
+            const mergedServices = [...projectServices, ..._useDefaultArray];
+            await use(mergedServices);
+        },
+        { scope: 'test' }
+    ],
+    /**
+     * Merges project and test-specific WebDriverIO configuration settings.
      * This allows for dynamic configuration based on the test environment.
      * @returns The merged configuration object.
      */
     config: [
-        async ({ _useConfig }, use, testInfo) => {
-            const mergeConfig = {
+        async ({ _useDefaultObject }, use, testInfo) => {
+            const merge = {
                 ...(testInfo.project.use as TestOptions).config,
-                ..._useConfig,
+                ..._useDefaultObject,
             };
-            await use(mergeConfig);
+            await use(merge);
         },
-        { scope: 'test', auto: true },
+        { scope: 'test' },
     ],
     /**
-     * Merges the provided capabilities with the project-specific capabilities.
+     * Merges project and test-specific browser/device capabilities.
      * This allows for dynamic capabilities based on the test environment.
      * @returns The merged capabilities object.
      */
     capabilities: [
-        async ({ _useCapabilities }, use, testInfo) => {
+        async ({ _useDefaultObject }, use, testInfo) => {
             const merge = {
                 ...(testInfo.project.use as TestOptions).capabilities,
-                ..._useCapabilities
+                ..._useDefaultObject,
             }
             await use(merge);
         },
-        { scope: 'test', auto: true }
+        { scope: 'test' }
     ],
     /**
      * Merges the provided screenshot options with the project-specific screenshot options.
@@ -48,12 +79,12 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
      * @returns The merged screenshot options object.
      */
     takeScreenshot: [
-        async ({ _useTakeScreenshot }, use, testInfo) => {
+        async ({ _useDefaultBoolean }, use, testInfo) => {
             const takeScreenshot = (testInfo.project.use as TestOptions).takeScreenshot;
-            const value = takeScreenshot === undefined ? _useTakeScreenshot : takeScreenshot;
+            const value = takeScreenshot === undefined ? _useDefaultBoolean : takeScreenshot;
             await use(value);
         },
-        { scope: 'test', auto: true }
+        { scope: 'test' }
     ],
     /**
      * Merges the provided recording options with the project-specific recording options.
@@ -61,60 +92,35 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
      * @returns The merged recording options object.
      */
     recordingScreen: [
-        async ({ _useRecordingScreen }, use, testInfo) => {
+        async ({ _useDefaultBoolean }, use, testInfo) => {
             const projectRecordingScreen = (testInfo.project.use as TestOptions).recordingScreen;
 
-            if (projectRecordingScreen === undefined) {
-                await use(_useRecordingScreen);
-                return;
-            }
-
-            if (typeof projectRecordingScreen === 'boolean') {
-                if (!projectRecordingScreen) {
-                    await use(_useRecordingScreen);
-                    return;
+            let finalValue: boolean | any = _useDefaultBoolean;
+            if (projectRecordingScreen !== undefined && projectRecordingScreen !== null) {
+                if (typeof projectRecordingScreen === 'boolean') {
+                    finalValue = projectRecordingScreen;
+                } else if (typeof projectRecordingScreen === 'object') {
+                    finalValue = projectRecordingScreen;
                 }
-                await use(_useRecordingScreen);
-                return;
             }
 
-            if (typeof _useRecordingScreen === 'object' && _useRecordingScreen !== null) {
-                const mergedOptions = {
-                    ...projectRecordingScreen,
-                    ..._useRecordingScreen
-                };
-                await use(mergedOptions);
-            } else {
-                await use(projectRecordingScreen);
-            }
-        },
-        { scope: 'test', auto: true }
-    ],
-    /**
-     * Creates a WebDriverIO session based on the provided configuration and capabilities.
-     * This fixture is used to manage the WebDriverIO session lifecycle.
-     * The driver instance is also made available globally.
-     * @param _useSession  The session management object containing configuration and capabilities
-     * @returns driver The created WebDriverIO driver instance
-     */
-    driver: [
-        async ({ _useSession }, use) => {
-            if (!_useSession) {
-                await use(undefined as any)
-                return;
-            }
-
-            driver = await _useSession.createSession();
-
-            await use(driver);
-
-            if (driver) await _useSession.deleteSession();
+            await use(finalValue);
         },
         { scope: 'test' }
     ],
     /**
-     * Creates a new page within the WebDriverIO session.
-     * @param driver The WebDriverIO driver instance
+     * Creates and manages WebDriverIO session with integrated service hooks.
+     * Handles initialization, test execution, cleanup, and global driver access.
+     * @returns driver The created WebDriverIO driver instance
+     */
+    driver: [
+        async ({ _useDriver }, use) => {
+            await use(_useDriver)
+        }, { scope: 'test' }
+    ],
+    /**
+     * Enhanced page object with WebDriverIO integration.
+     * Falls back to standard Playwright page when driver unavailable.
      * @returns The created page instance
      */
     page: [
@@ -128,47 +134,60 @@ const _test = base.extend<TestArgs & HiddenTestArgs, WorkerArgs>({
             await pages.resolve();
             await use(pages.createExtends);
             await pages.reject();
-        }, { scope: 'test' }
+        },
+        { scope: 'test' }
     ],
     /**
-     * Manages the WebDriverIO session lifecycle.
-     * This fixture is used to create and delete the session based on the provided configuration and capabilities.
-     * @param config  The WebDriverIO configuration object
-     * @param capabilities  The WebDriverIO capabilities object
-     * @param baseURL  The base URL for the WebDriverIO session
+     * Internal session management that validates and creates WebDriverIO sessions.
      * @returns Session instance managing the WebDriverIO session
      */
     _useSession: [
-        async ({ config, capabilities, baseURL }, use, testInfo) => {
-            const mergeConfig = {
-                ...config,
-                capabilities: capabilities,
+        async ({ config, capabilities, baseURL, services }, use, testInfo) => {
+            const project = (testInfo.project.use as TestOptions);
+            const options = {
+                ...config, capabilities,
                 baseUrl: baseURL || config.baseUrl,
+                services: services
             };
-
-            const newTestInfo = testInfo.project.use as TestOptions;
-
-            const session = Session.isValid(mergeConfig, newTestInfo);
+            console.log(testInfo.project.use)
+            const session = Session.isValid(options, project);
             if (!session) {
                 await use(undefined);
                 return;
-            };
-
+            }
             await use(session);
-        }, { scope: 'test', title: 'session' }
+        },
+        { scope: 'test' }
     ],
-    _useConfig: [{}, { option: true }],
-    _useCapabilities: [{}, { option: true }],
-    _useRecordingScreen: [false, { option: true }],
-    _useTakeScreenshot: [false, { option: true }],
+    _useDriver: [
+        async ({ _useSession, worker, config, capabilities, services }, use, testInfo) => {
+            if (!_useSession) {
+                await use(undefined as any)
+                return;
+            }
+
+            await worker.testStart(config, capabilities, services);
+            driver = await _useSession.createSession();
+            await worker.testMiddle(testInfo, driver);
+            await use(driver);
+            await worker.testEnd(testInfo);
+        },
+        { scope: 'test', title: 'Services & Hooks' }
+    ],
+    // Internal fixture for providing default array values in test overrides
+    _useDefaultArray: [[], { option: true }],
+    // Internal fixture for providing default object values in test overrides  
+    _useDefaultObject: [{}, { option: true }],
+    // Internal fixture for providing default boolean values in test overrides
+    _useDefaultBoolean: [false, { option: true }]
 })
 
 /**
- * Test fixture for managing WebDriverIO sessions.
+ * Extended Playwright test with WebDriverIO integration.
  */
 export const test = _test as TestType<TestArgs, WorkerArgs>;
 
 /**
- * Test information for a single test case.
+ * Type definition for the extended test fixture.
  */
 export type TestInfo = typeof test;

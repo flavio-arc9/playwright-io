@@ -1,64 +1,5 @@
-import type { Capabilities } from "@wdio/types";
-import { ChainablePromiseArray, ChainablePromiseElement } from "webdriverio";
-
-/**
- * Test runner hook names supported by WebDriverIO.
- */
-type TestRunnerHooks = 
-    | 'onComplete'
-    | 'onPrepare'
-    | 'onReload'
-    | 'onWorkerStart'
-    | 'onWorkerEnd'
-    | 'before'
-    | 'beforeAssertion'
-    | 'beforeCommand'
-    | 'beforeHook'
-    | 'beforeSession'
-    | 'beforeSuite'
-    | 'beforeTest'
-    | 'beforeFeature'
-    | 'beforeScenario'
-    | 'beforeStep'
-    | 'after'
-    | 'afterAssertion'
-    | 'afterCommand'
-    | 'afterHook'
-    | 'afterSession'
-    | 'afterSuite'
-    | 'afterTest'
-    | 'afterFeature'
-    | 'afterScenario'
-    | 'afterStep';
-
-/**
- * Test runner configuration options supported by WebDriverIO.
- */
-type TestRunnerOptions =
-    | 'specs'
-    | 'exclude'
-    | 'suites'
-    | 'capabilities'
-    | 'injectGlobals'
-    | 'specFileRetries'
-    | 'specFileRetriesDelay'
-    | 'specFileRetriesDeferred'
-    | 'groupLogsByTestSpec'
-    | 'framework'
-    | 'mochaOpts'
-    | 'jasmineOpts'
-    | 'cucumberOpts'
-    | 'cucumberFeaturesWithLineNumbers'
-    | 'filesToWatch'
-    | 'updateSnapshots'
-    | 'tsConfigPath'
-    | 'watch'
-    | 'shard';
-
-
-export { TestOptions } from './TestOptions';
-export { Context, TestArgs, HiddenTestArgs, WorkerArgs } from './TestArgs';
-export { Page } from './Page';
+import type { Capabilities, Options, Services } from "@wdio/types";
+import type { ChainablePromiseArray, ChainablePromiseElement } from "webdriverio";
 
 /** 
  * Represents ChainablePromiseElement 
@@ -73,25 +14,33 @@ export type Elements = ChainablePromiseArray;
 /**
  * WebDriverIO configuration type without test runner specific options.
  */
-export type IOConfig = Omit<WebdriverIO.Config, TestRunnerOptions | TestRunnerHooks>;
+export type IOConfig = Options.WebdriverIO
 
 /**
  * WebDriverIO capabilities type for standalone requests.
  */
-export type IOCapabilities = Capabilities.RequestedStandaloneCapabilities;
+export type IOCapabilities = Capabilities.WithRequestedCapabilities;
+
+/**
+ * WebDriverIO services type for standalone requests.
+ */
+export type IOServices = Services.ServiceEntry
 
 /**
  * Combined WebDriverIO remote configuration with capabilities.
  */
-export type IORemote = IOConfig & {
-    capabilities: IOCapabilities;
-};
+export type IORemote = IOConfig & IOCapabilities
+
+/**
+ * Full WebDriverIO configuration type including test runner specific options.
+ */
+export type WdioConfig = WebdriverIO.Config
 
 /**
  * Platform-specific selector configuration.
  * Allows defining different selectors for different platforms in a single object.
  */
-export interface Selector {
+export type Locators = string | {
     /** Android-specific selector (UiAutomator2, Espresso) */
     android?: string;
     /** iOS-specific selector (XCUITest) */
@@ -105,7 +54,7 @@ export interface Selector {
 /**
  * Configuration options for element waiting operations.
  */
-export interface WaitForElementOptions {
+export type WaitForElementOptions = {
     /** Maximum time to wait in milliseconds */
     timeout?: number;
     /** Whether element should be visible */
@@ -117,7 +66,7 @@ export interface WaitForElementOptions {
 /**
  * Configuration options for screen recording
  */
-export interface RecorderOptions {
+export type RecorderOptions = {
     /** Video format type */
     videoType?: 'mp4' | 'mov' | 'webm';
     /** Video quality setting - can be a preset or CRF value */
@@ -125,3 +74,7 @@ export interface RecorderOptions {
     /** Maximum recording duration in seconds */
     maxDuration?: number;
 } 
+
+export * from './TestOptions';
+export * from './TestArgs';
+export * from './Page';

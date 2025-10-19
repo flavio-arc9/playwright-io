@@ -1,6 +1,6 @@
 
 import { Page as OriginPage } from '@playwright/test';
-import { Context, Element, Elements, Selector } from '.';
+import { Context, Element, Elements, Locators } from '.';
 
 /**
  * Extended Playwright Page interface that adds limited WebDriverIO element selection capabilities.
@@ -12,72 +12,25 @@ export interface Page extends OriginPage {
      * @returns Context - The WebDriverIO context for the page
      */
     io: Context;
+
     /**
-     * The `locator$` command is a WebDriverIO method that finds an element in the page using 
-     * CSS or XPath selectors.
+     * The `locator$` method finds an element using platform-specific locators.
      * 
-     * It returns a WebDriverIO element that can be used to perform actions like click, setText, etc.
-     * 
-     * @param selector  A CSS or XPath selector to query the element
-     * @return Element == ChainablePromiseElement  WebDriverIO element object for the found element
+     * This method enhances `locator$` by accepting either a string or a `Locator`
+     * object that can contain different locators for various platforms (android, ios, web, mobile).
+     * The appropriate locator is chosen based on the current platform.
+     *
+     * @param selector  A string locator or `Locator` object with platform-specific locators
+     * @return Element WebDriverIO element object for the found element
      * 
      * @example
      * ```ts
-     * // using CSS selector
-     * const button = page.locator$('.btn');
+     * // using string locator
+     * const button = page.locator$('.submit-button');
      * await button.click();
-     * 
-     * // using XPath selector
-     * const header = page.locator$('//h1');
-     * console.log(await header.getText());
-     * ```
-     */
-    locator$: (selector: string) => Element;
-    /**
-     * The `locator$$` command is a WebDriverIO method that finds multiple elements in the page using 
-     * CSS or XPath selectors.
-     * 
-     * It returns an array of WebDriverIO elements that can be used to perform actions on each element.
-     * 
-     * @param selector  A CSS or XPath selector to query the elements
-     * @return Elements == ChainablePromiseArray  Array of WebDriverIO element objects for the found elements
-     * 
-     * @example
-     * ```ts
-     * // using CSS selector
-     * const buttons = page.locator$$('.btn');
-     * console.log('Number of buttons found:', buttons.length);
-     * 
-     * // clicking each button in the collection
-     * for (const button of buttons) {
-     *   await button.click();
-     * }
-     * 
-     * // using XPath selector
-     * const headers = page.locator$$('//h2');
-     * const headerTexts = await Promise.all(headers.map(header => header.getText()));
-     * console.log(headerTexts);
-     * ```
-     */
-    locator$$: (selector: string) => Elements;
-    /**
-     * The `selector` method finds an element using platform-specific selectors.
-     * 
-     * This method enhances `locator$` by accepting either a string selector or a `Selector` 
-     * object that can contain different selectors for various platforms (android, ios, web, mobile).
-     * The appropriate selector is chosen based on the current platform.
-     * 
-     * @param selector  A string selector or `Selector` object with platform-specific selectors
-     * @return Element == ChainablePromiseElement  WebDriverIO element object for the found element
-     * 
-     * @example
-     * ```ts
-     * // using string selector
-     * const button = page.selector('.submit-button');
-     * await button.click();
-     * 
-     * // using platform-specific Selector object
-     * const menuButton = page.selector({
+     *
+     * // using platform-specific Locator object
+     * const menuButton = page.locator$({
      *   android: '-android=resourceId("com.example.app:id/menu_button")',
      *   ios: '~Menu',
      *   web: '#menuBtn'
@@ -85,25 +38,26 @@ export interface Page extends OriginPage {
      * await menuButton.click();
      * ```
      */
-    selector: (selector: Selector | string) => Element;
+    locator$: (selector: Locators) => Element;
+
     /**
-     * The `selectors` method finds multiple elements using platform-specific selectors.
-     * 
-     * This method enhances `locator$$` by accepting either a string selector or a `Selector` 
-     * object that can contain different selectors for various platforms (android, ios, web, mobile).
-     * The appropriate selector is chosen based on the current platform.
-     * 
-     * @param selector  A string selector or `Selector` object with platform-specific selectors
-     * @return Element == ChainablePromiseArray  Array of WebDriverIO element objects for the found elements
+     * The `locator$$` method finds multiple elements using platform-specific locators.
+     *
+     * This method enhances `locator$$` by accepting either a string selector or a `Locator`
+     * object that can contain different locators for various platforms (android, ios, web, mobile).
+     * The appropriate locator is chosen based on the current platform.
+     *
+     * @param selector  A string selector or `Locator` object with platform-specific locators
+     * @return Elements Array of WebDriverIO element objects for the found elements
      * 
      * @example
      * ```ts
      * // using string selector
-     * const buttons = page.selectors('.btn');
+     * const buttons = page.locator$$('.btn');
      * console.log('Number of buttons found:', buttons.length);
      * 
-     * // using platform-specific Selector object
-     * const listItems = page.selectors({
+     * // using platform-specific Locator object
+     * const listItems = page.locator$$({
      *   android: '-android=className("android.widget.ListView").childSelector(className("android.widget.ListItem"))',
      *   ios: '//XCUIElementTypeTable//XCUIElementTypeCell',
      *   web: '.list-item'
@@ -113,73 +67,35 @@ export interface Page extends OriginPage {
      * console.log(itemTexts);
      * ```
      */
-    selectors: (selector: Selector | string) => Elements;
+    locator$$: (selector: Locators) => Elements;
+    
     /**
-     * The `element` method finds an element using platform-specific selectors.
+     * The `waitForElement` method waits for an element using platform-specific locators.
      * 
-     * This method enhances `locator$` by accepting either a string selector or a `Selector` 
+     * This method enhances element waiting by accepting either a string selector or a `Locator` 
      * object that can contain different selectors for various platforms (android, ios, web, mobile).
      * The appropriate selector is chosen based on the current platform.
      * 
-     * @param selector  A string selector or `Selector` object with platform-specific selectors
+     * @param selector  A string selector or `Locator` object with platform-specific selectors
+     * @param options  Configuration options for timeout, visibility, and enabled state
      * @return Element  WebDriverIO element object for the found element
      * 
      * @example
      * ```ts
      * // using string selector
-     * const button = page.element('.submit-button');
+     * const button = await page.waitForElement('.submit-button', { timeout: 5000, visible: true });
      * await button.click();
      * 
-     * // using platform-specific Selector object
-     * const menuButton = page.element({
+     * // using platform-specific Locator object
+     * const menuButton = await page.waitForElement({
      *   android: '-android=resourceId("com.example.app:id/menu_button")',
      *   ios: '~Menu',
      *   web: '#menuBtn'
-     * });
+     * }, { visible: true, enabled: true });
      * await menuButton.click();
      * ```
      */
-    element: (selector: Selector | string) => Element;
-    /**
-     * The `elements` method finds multiple elements using platform-specific selectors.
-     * 
-     * This method enhances `locator$$` by accepting either a string selector or a `Selector` 
-     * object that can contain different selectors for various platforms (android, ios, web, mobile).
-     * The appropriate selector is chosen based on the current platform.
-     * 
-     * @param selector  A string selector or `Selector` object with platform-specific selectors
-     * @return Elements  Array of WebDriverIO element objects for the found elements
-     * 
-     * @example
-     * ```ts
-     * // using string selector
-     * const buttons = page.elements('.btn');
-     * console.log('Number of buttons found:', buttons.length);
-     * 
-     * // using platform-specific Selector object
-     * const listItems = page.elements({
-     *   android: '-android=className("android.widget.ListView").childSelector(className("android.widget.ListItem"))',
-     *   ios: '//XCUIElementTypeTable//XCUIElementTypeCell',
-     *   web: '.list-item'
-     * });
-     * 
-     * const itemTexts = await Promise.all(listItems.map(item => item.getText()));
-     * console.log(itemTexts);
-     * ```
-     */
-    elements: (selector: Selector | string) => Elements;
-    /**
-     * The `waitForElement` method waits for an element to appear in the DOM using platform-specific selectors.
-     * 
-     * This method accepts either a string selector or a `Selector` object that can contain different selectors
-     * for various platforms (android, ios, web, mobile). It waits until the element is present and optionally checks
-     * if it is visible or enabled.
-     * 
-     * @param locator  A string selector or `Selector` object with platform-specific selectors
-     * @param options  Optional parameters to control the wait behavior
-     * @return ChainablePromiseArray/Element  Array of WebDriverIO element objects for the found elements
-     */
-    waitForElement: (locator: string | Selector, options?: {
+    waitForElement: (selector: Locators, options?: {
         timeout?: number;
         visible?: boolean;
         enabled?: boolean;

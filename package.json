@@ -1,9 +1,14 @@
 {
 	"name": "playwright-io",
-	"version": "1.0.2",
 	"description": "Mobile Testing with Playwright runner",
+	"version": "1.0.3",
+	"homepage": "https://flavio-arc9.github.io/playwright-io/#/es/",
+	"author": "Flavio Romero <flavio.arc9@gmail.com>",
 	"license": "MIT",
-	"author": "Flavio Romero",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/flavio-arc9/playwright-io.git"
+	},
 	"engines": {
 		"node": ">=18.20.0"
 	},
@@ -19,22 +24,17 @@
 		"playwright-io",
 		"playwright-webdriverio"
 	],
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/flavio-arc9/playwright-io.git"
-	},
 	"files": [
 		"dist",
 		"README.md",
 		"LICENSE"
 	],
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"scripts": {
 		"build": "npm run clean && tsc",
 		"clean": "rm -rf dist",
-		"test": "playwright test",
-		"prepublishOnly": "npm run build"
+		"test": "playwright test"
 	},
 	"devDependencies": {
 		"@types/node": "^22.10.7",
@@ -45,6 +45,7 @@
 	},
 	"dependencies": {
 		"@ffmpeg-installer/ffmpeg": "^1.1.0",
+		"@wdio/utils": "^9.19.2",
 		"glob": "^11.0.3",
 		"webdriverio": "latest"
 	}

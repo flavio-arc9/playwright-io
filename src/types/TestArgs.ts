@@ -1,8 +1,9 @@
-import { IOCapabilities, IOConfig, Page, RecorderOptions, TestOptions } from "."
+import { Page } from "./Page"
+import { TestOptions } from "./TestOptions"
 import { Browser as ExtendBrowser } from "webdriverio";
 import { PlaywrightTestArgs, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from "@playwright/test";
 import { Session } from "../session";
-
+import { Instance } from "../instance";
 
 /**
  * Context represents WebDriverIO's Browser instance, 
@@ -21,6 +22,7 @@ export interface TestArgs extends TestOptions, PlaywrightTestArgs {
      * See: https://webdriver.io/docs/api/browser
      */
     driver: Context
+    
     /**
      * Extended Playwright Page interface that adds limited WebDriverIO element selection capabilities.
      * 
@@ -38,14 +40,16 @@ export interface TestArgs extends TestOptions, PlaywrightTestArgs {
  * These are not exposed in the public API but are used for configuration merging.
  */
 export interface HiddenTestArgs {
-    _useCapabilities: IOCapabilities;
-    _useConfig: IOConfig;
+    _useDefaultObject: object;
+    _useDefaultBoolean: boolean;
+    _useDefaultArray: Array<any>;
     _useSession?: Session;
-    _useRecordingScreen: RecorderOptions | boolean;
-    _useTakeScreenshot: boolean;
+    _useDriver: Context;
 }
 
 /**
  * Worker arguments
  */
-export type WorkerArgs = PlaywrightWorkerArgs & PlaywrightWorkerOptions;
+export interface WorkerArgs extends PlaywrightWorkerArgs, PlaywrightWorkerOptions {
+    worker: Instance;
+}
